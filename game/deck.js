@@ -68,7 +68,9 @@ Deck.prototype.toString = function() {
 
 Deck.prototype.distribute = function(players, qty) {
     for (var times = 0; times < qty; times++) {
-        for(var player of players) {
+        for(var i in players) {
+            var player = players[i];
+            
             player.pega(this.draw());
         }
     }
