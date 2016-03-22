@@ -11,7 +11,7 @@ function Player() {
 
 Player.prototype.LIVES = 3;
 
-Player.prototype.pega = function(card) {
+Player.prototype.takeCard = function(card) {
     this.hand.push(card);
 };
 

@@ -71,7 +71,7 @@ Deck.prototype.distribute = function(players, qty) {
         for(var i in players) {
             var player = players[i];
             
-            player.pega(this.draw());
+            player.takeCard(this.draw());
         }
     }
 };
