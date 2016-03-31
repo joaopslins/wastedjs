@@ -7,10 +7,6 @@ app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(__dirname + '/public'));
 
-// views is directory for all template files
-app.set('views', __dirname + '/views');
-app.set('view engine', 'html');
-
 app.get('/', function(request, response) {
   response.sendFile(__dirname + "/public/index.html");
 });
@@ -25,13 +21,13 @@ io.on('connection', function (socket)
 {
 	numUsers++;
 	console.log(numUsers + " entrou");
-	
+
 	socket.on('send message', function (data)
 	{
 		console.log("chegou msg: " + data);
 		io.sockets.emit('update message', data);
 	});
-	
+
 	socket.on('disconnect', function(){
 		console.log(numUsers + " saiu");
 		numUsers--;
@@ -39,7 +35,7 @@ io.on('connection', function (socket)
 });
 
 
-/* 
+/*
 io.sockets.emit() - send to all connected clients (same as socket.emit)
 io.sockets.on() - initial connection from a client.
 

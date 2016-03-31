@@ -1,18 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html ng-app>
 	<head>
-		<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+		<script src="js/angular.js"></script>
+		<script src="js/main.js"></script>
+ 		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<!-- Use when finished: <script src="lib/angular.min.js"></script> -->
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="/main.js"></script>
 
 	</head>
 
 	<body>
-		<div class="wrapper">
-			<h2>Change the message:</h2>
-			<input class="messageInput" type="input" />
-			<input class="button" type="submit" value="Go" />
-			<h3 class="message">test</h3>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 well well-sm">
+					<p>
+						<span class="glyphicon glyphicon-search" />
+						Change the message:
+					</p>
+					<input class="form-control" type="text" ng-model="teste" />
+					<h3>{{teste}}</h3>
+				</div>
+			</div>
 		</div>
+
+		<!-- End of HTML file so it won't mess up with page loading -->
+		<script src="js/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
 	</body>
 </html>
