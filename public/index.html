@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html ng-app>
 	<head>
+		<script src="/socket.io/socket.io.js"></script>
 		<script src="js/angular.js"></script>
-		<script src="js/main.js"></script>
  		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<!-- Use when finished: <script src="lib/angular.min.js"></script> -->
-		<script src="/socket.io/socket.io.js"></script>
 
 	</head>
 
@@ -19,6 +18,9 @@
 					</p>
 					<input class="form-control" type="text" ng-model="teste" />
 					<h3>{{teste}}</h3>
+					<button id="button" type="button" class="btn btn-default">
+						Teste
+					</button>
 				</div>
 			</div>
 		</div>
@@ -26,5 +28,6 @@
 		<!-- End of HTML file so it won't mess up with page loading -->
 		<script src="js/jquery.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
+		<script src="js/main.js"></script>
 	</body>
 </html>

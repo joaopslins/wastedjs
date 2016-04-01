@@ -3,7 +3,7 @@
  * A card with rank and suit.
  * It's value is calculated based on the rules of Fodinha.
  */
-function Card(rank, suit) {
+var Card = function(rank, suit) {
     this.rank = rank;
     this.suit = suit;
 }
@@ -38,3 +38,5 @@ Card.prototype.SUIT = ['S', 'H', 'C', 'D'];
 Card.prototype.toString = function() {
     return Card.prototype.RANK[this.rank] + Card.prototype.SUIT[this.suit];
 };
+
+module.exports = Card;

@@ -3,6 +3,11 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require ('socket.io') (server);
 
+// External Files
+var Card = require ('./game/card');
+var Deck = require ('./game/deck');
+var Player = require ('./game/player');
+
 app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(__dirname + '/public'));
@@ -19,15 +24,13 @@ var numUsers = 0;
 
 io.on('connection', function (socket)
 {
-	numUsers++;
-	console.log(numUsers + " entrou");
+    var card = new Card (2,3);
+	console.log(card.toString());
 
 	socket.on('send message', function (data)
 	{
-		console.log("chegou msg: " + data);
-		io.sockets.emit('update message', data);
+		console.log("teste");
 	});
-
 	socket.on('disconnect', function(){
 		console.log(numUsers + " saiu");
 		numUsers--;

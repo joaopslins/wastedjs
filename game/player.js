@@ -2,7 +2,7 @@
  *
  * A player of Fodinha.
  */
-function Player() {
+var Player = function () {
     this.lives = Player.prototype.LIVES;
 
     this.hand = new Deck();
@@ -29,3 +29,5 @@ Player.prototype.choose = function(choice) {
 Player.prototype.toString = function() {
     return ''+ this.hand;
 };
+
+module.exports = Player;

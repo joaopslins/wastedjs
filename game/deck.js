@@ -3,7 +3,7 @@
  * A collection of cards.
  * Supports FIFO and random removal.
  */
-function Deck() {
+var Deck = function () {
     this.cards = [];
 }
 
@@ -70,8 +70,10 @@ Deck.prototype.distribute = function(players, qty) {
     for (var times = 0; times < qty; times++) {
         for(var i in players) {
             var player = players[i];
-            
+
             player.takeCard(this.draw());
         }
     }
 };
+
+module.exports = Deck;
