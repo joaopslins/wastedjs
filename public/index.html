@@ -1,33 +1,125 @@
 <!DOCTYPE html>
-<html ng-app>
+<html ng-app="fodinhaJSapp">
 	<head>
+
+		<!-- Socket IO -->
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="js/angular.js"></script>
- 		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<!-- Use when finished: <script src="lib/angular.min.js"></script> -->
+
+		<!-- Angular -->
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.js"></script>
+
+ 		<!-- jQuery -->
+		<script src="https://code.jquery.com/jquery-2.2.2.js" integrity="sha256-4/zUCqiq0kqxhZIyp4G0Gk+AOtCJsY1TA00k5ClsZYE=" crossorigin="anonymous"></script>
+
+		<!-- Bootstrap -->
+ 		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js"></script>
+
+		<!-- Source -->
+		<link href="css/main.css" rel="stylesheet">
+		<script src="js/main.js"></script>
 
 	</head>
 
-	<body>
-		<div class="container">
+	<body ng-controller="fodinhaJSctrl">
+
+		<!-- Navigation Bar -->
+		<nav class="navbar navbar-inverse">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand">FodinhaJS</a>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Main Container -->
+		<div class="container"  >
 			<div class="row">
-				<div class="col-md-3 well well-sm">
-					<p>
-						<span class="glyphicon glyphicon-search" />
-						Change the message:
-					</p>
-					<input class="form-control" type="text" ng-model="teste" />
-					<h3>{{teste}}</h3>
-					<button id="button" type="button" class="btn btn-default">
-						Teste
-					</button>
+				<div class="col-md-12 panel panel-default" style = "padding-top: 15px">
+
+					<!-- Row = Login and Game -->
+					<div class="row">
+
+						<!-- Login Panel -->
+						<div class="col-md-3 col-xs-4">
+							<div class="panel panel-default">
+								<div class="panel-heading" style = "text-align:center">
+									<h3 class="panel-title"><b>Login</b></h3>
+								</div>
+
+								<div ng-switch="loggedIn">
+
+									<!-- Not logged in -->
+									<div ng-switch-when="false" class="panel-body">
+										<div class="row">
+											<div class="col-xs-3">
+												<h4>Nick:</h4>
+											</div>
+											<div class="col-xs-9">
+												<input class="form-control" ng-model="nick" type="text">
+											</div>
+										</div>
+										<br />
+										<button type="button" class="btn btn-lg btn-default center-block" ng-click="loginToggle()">
+											Login
+										</button>
+									</div>
+
+									<!-- Logged in -->
+									<div ng-switch-when="true" class="panel-body">
+										<div style = "text-align:center">
+											<h4>You are logged in, {{ nick }}</h4>
+										</div>
+										<br />
+										<button type="button" class="btn btn-lg btn-danger center-block" ng-click="loginToggle()">
+											Logout
+										</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- Game Panel -->
+						<div class="col-md-9 col-xs-8">
+							<div class="panel panel-default">
+								<div class="panel-heading" style = "text-align:center">
+									<h3 class="panel-title"><b>Game</b></h3>
+								</div>
+								<div class="panel-body">
+									{{ loggedIn }}
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<!-- Row = Players -->
+					<div class="row">
+
+						<!-- Players Panel -->
+						<div class="col-md-3 col-xs-4">
+							<div class="panel panel-default">
+							  	<div class="panel-heading"  style = "text-align:center">
+					    			<h3 class="panel-title"><b>Players</b></h3>
+							  	</div>
+							  	<div class="panel-body">	
+
+							  	</div>
+							  	<div class="panel-footer">
+									<button type="button" class="btn btn-danger center-block">
+										Ready
+									</button>
+							  	</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Main Container end -->
 				</div>
 			</div>
 		</div>
 
-		<!-- End of HTML file so it won't mess up with page loading -->
-		<script src="js/jquery.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/main.js"></script>
 	</body>
 </html>
