@@ -16,6 +16,7 @@ http://bigtext.org/ - Alligator2
  * A card with rank and suit.
  * It's value is calculated based on the rules of Fodinha.
  */
+
 var Card = function(rank, suit) {
     this.rank = rank;
     this.suit = suit;
@@ -69,6 +70,7 @@ Card.prototype.toString = function() {
  * A collection of cards.
  * Supports FIFO and random removal.
  */
+
 var Deck = function () {
     this.cards = [];
 }
@@ -151,8 +153,6 @@ Deck.prototype.distribute = function(players, qty) {
 +#+       +#+       +#+     +#+ +#+   +#+       +#+    +#+
 #+#       #+#       #+#     #+# #+#   #+#       #+#    #+#
 ###       #############     ### ###   #############    ###
-
-
 
 */
 

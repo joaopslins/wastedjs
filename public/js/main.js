@@ -1,39 +1,44 @@
 var fodinhaJS = angular.module ("fodinhaJSapp", ["ngAnimate"]);
 
-fodinhaJS.controller("fodinhaJSctrl", function($scope)
+fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 {
-	$scope.loggedIn = false;
+	$scope.loggedIn = 'no';
 	$scope.nick = "";
 
 	$scope.loginToggle = function()
 	{
 		// If logging in
-		if(!$scope.loggedIn)
+		if($scope.loggedIn == "no")
 		{
-
+			$scope.loggedIn = false;
+			$timeout( function() {
+				$scope.loggedIn = "yes";
+			}, 500);
 		}
 		// If logging out
-		else
+		else if($scope.loggedIn == "yes")
 		{
-
+			$scope.loggedIn = false;
+			$timeout( function() {
+				$scope.loggedIn = "no";
+			}, 500);
 		}
 
-		$scope.loggedIn = !$scope.loggedIn;
 	}
 });
 
-$(function() {
-	var $button = $("#button");
-
-	var socket = io(window.location.host);
-
-	$button.click( function()
-	{
-		socket.emit('send message');
-	});
-
-	socket.on('update message', function(data)
-	{
-		$message.text(data);
-	});
-});
+// $(function() {
+// 	var $button = $("#button");
+//
+// 	var socket = io(window.location.host);
+//
+// 	$button.click( function()
+// 	{
+// 		socket.emit('send message');
+// 	});
+//
+// 	socket.on('update message', function(data)
+// 	{
+// 		$message.text(data);
+// 	});
+// });

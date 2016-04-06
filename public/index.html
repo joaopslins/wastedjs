@@ -48,10 +48,11 @@
 									<h3 class="panel-title"><b>Login</b></h3>
 								</div>
 
-								<div ng-switch="loggedIn">
+
+								<div class="panel-body">
 
 									<!-- Not logged in -->
-									<div ng-switch-when="false" class="panel-body">
+									<div ng-show="loggedIn == 'no'" class="login-animate">
 										<div class="row">
 											<div class="col-xs-3">
 												<h4>Nick:</h4>
@@ -67,7 +68,7 @@
 									</div>
 
 									<!-- Logged in -->
-									<div ng-switch-when="true" class="panel-body">
+									<div ng-show="loggedIn == 'yes'" class="login-animate">
 										<div style = "text-align:center">
 											<h4>You are logged in, {{ nick }}</h4>
 										</div>
@@ -88,7 +89,7 @@
 									<h3 class="panel-title"><b>Game</b></h3>
 								</div>
 								<div class="panel-body">
-									{{ loggedIn }}
+
 								</div>
 							</div>
 						</div>
@@ -99,12 +100,12 @@
 					<div class="row">
 
 						<!-- Players Panel -->
-						<div class="col-md-3 col-xs-4">
+						<div class="col-md-3 col-xs-4 login-animate" ng-show="loggedIn == 'yes'">
 							<div class="panel panel-default">
 							  	<div class="panel-heading"  style = "text-align:center">
 					    			<h3 class="panel-title"><b>Players</b></h3>
 							  	</div>
-							  	<div class="panel-body">	
+							  	<div class="panel-body">
 
 							  	</div>
 							  	<div class="panel-footer">
@@ -114,6 +115,7 @@
 							  	</div>
 							</div>
 						</div>
+						
 					</div>
 
 					<!-- Main Container end -->

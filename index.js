@@ -28,7 +28,6 @@ io.on('connection', function (socket)
 {
     var deck = new Deck ();
     deck.generate();
-	console.log(deck);
 
 	socket.on('send message', function (data)
 	{
