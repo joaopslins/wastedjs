@@ -1,3 +1,19 @@
+/* =============== UTILITIES ================ */
+
+.not-ready{
+    font-weight: normal;
+    font-size: 150%;
+    color: darkred;
+}
+
+.ready{
+    font-weight: bold;
+    color: forestgreen;
+    font-size: 175%;
+}
+
+/* =============== ANIMATIONS ================ */
+
 .login-animate {
     opacity: 1;
 }
@@ -12,4 +28,30 @@
 
 .login-animate.ng-hide {
   opacity: 0;
+}
+
+.player-animate {
+  line-height:25px;
+  list-style:none;
+  box-sizing:border-box;
+}
+
+.player-animate.ng-move,
+.player-animate.ng-enter,
+.player-animate.ng-leave {
+  transition:all linear 0.5s;
+}
+
+.player-animate.ng-leave.ng-leave-active,
+.player-animate.ng-move,
+.player-animate.ng-enter {
+  opacity:0;
+  max-height:0;
+}
+
+.player-animate.ng-leave,
+.player-animate.ng-move.ng-move-active,
+.player-animate.ng-enter.ng-enter-active {
+  opacity:1;
+  max-height:30px;
 }

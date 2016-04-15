@@ -89,7 +89,7 @@
 									<h3 class="panel-title"><b>Game</b></h3>
 								</div>
 								<div class="panel-body">
-
+									<!-- Game -->
 								</div>
 							</div>
 						</div>
@@ -102,20 +102,27 @@
 						<!-- Players Panel -->
 						<div class="col-md-3 col-xs-4 login-animate" ng-show="loggedIn == 'yes'">
 							<div class="panel panel-default">
+								
 							  	<div class="panel-heading"  style = "text-align:center">
 					    			<h3 class="panel-title"><b>Players</b></h3>
 							  	</div>
-							  	<div class="panel-body" style = "text-align:center">
-							  		Teste
+
+								<!-- Player List -->
+							  	<div class="panel-body"  style = "text-align:center">
+									<div ng-repeat="player in players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
+										{{player.name}}
+									</div>
 							  	</div>
+
+								<!-- Ready Button -->
 							  	<div class="panel-footer">
-									<button type="button" class="btn btn-danger center-block">
+									<button type="button" class="btn btn-danger center-block" ng-click="readyToggle()">
 										Ready
 									</button>
 							  	</div>
 							</div>
 						</div>
-						
+
 					</div>
 
 					<!-- Main Container end -->

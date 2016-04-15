@@ -17,7 +17,8 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 				$scope.loggedIn = "yes";
 			}, 500);
 
-			//Add new player TODO - SERVER
+			//Add new player
+			// TODO USING NODE SERVER
 			$scope.players.push(
 				{
 					name : $scope.nick,
@@ -35,13 +36,30 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 				$scope.loggedIn = "no";
 			}, 500);
 
-			//Remove current player TODO - SERVER
+			//Remove current player
+			// TODO USING NODE SERVER
 			$scope.players = $scope.players.filter(function (player)
 			{
 				return player.name != $scope.nick;
 			});
 		}
 
+		// Reset ready status
+		$scope.ready = false;
+	}
+
+	$scope.readyToggle = function()
+	{
+		var i;
+		for(i = 0; i < $scope.players.length; i++)
+		{
+			if($scope.players[i].name == $scope.nick)
+			{
+				console.log("achou");
+				$scope.players[i].ready = !$scope.players[i].ready;
+				break;
+			}
+		}
 	}
 
 	$scope.players = [
