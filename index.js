@@ -4,9 +4,9 @@ var server = require('http').createServer(app);
 var io = require ('socket.io') (server);
 
 // External Files
-var Card = require ('game/card');
-var Deck = require ('game/deck');
-var Player = require ('game/player');
+var Card = require ('./game/card');
+var Deck = require ('./game/deck');
+var Player = require ('./game/player');
 
 app.set('port', (process.env.PORT || 5000));
 

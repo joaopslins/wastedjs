@@ -1,5 +1,7 @@
 'use strict';
 
+var Deck = require ('./deck');
+
 var Player = function () {
     this.lives = Player.prototype.LIVES;
 
