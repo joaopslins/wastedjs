@@ -41,9 +41,9 @@
 					<!-- Row = Login and Game -->
 					<div class="row">
 
-						<!-- Login Panel -->
 						<div class="col-md-3 col-xs-4">
-							<div class="panel panel-default">
+							<!-- Login Panel -->
+							<div class="panel panel-default fjs-login-panel">
 								<div class="panel-heading" style = "text-align:center">
 									<h3 class="panel-title"><b>Login</b></h3>
 								</div>
@@ -58,7 +58,7 @@
 												<h4>Nick:</h4>
 											</div>
 											<div class="col-xs-9">
-												<input class="form-control" ng-model="nick" type="text">
+												<input class="form-control" ng-model="me.name" type="text">
 											</div>
 										</div>
 										<br />
@@ -70,7 +70,7 @@
 									<!-- Logged in -->
 									<div ng-show="loggedIn == 'yes'" class="login-animate">
 										<div style = "text-align:center">
-											<h4>You are logged in, {{ nick }}</h4>
+											<h4>You are logged in, {{ me.nick }}</h4>
 										</div>
 										<br />
 										<button type="button" class="btn btn-lg btn-danger center-block" ng-click="loginToggle()">
@@ -79,6 +79,28 @@
 									</div>
 
 								</div>
+							</div>
+
+							<!-- Player Panel -->
+							<div class="panel panel-default login-animate" ng-show="loggedIn == 'yes'">
+
+							  	<div class="panel-heading"  style = "text-align:center">
+					    			<h3 class="panel-title"><b>Players</b></h3>
+							  	</div>
+
+								<!-- Player List -->
+							  	<div class="panel-body"  style = "text-align:center">
+									<div ng-repeat="player in players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
+										{{player.name}}
+									</div>
+							  	</div>
+
+								<!-- Ready Button -->
+							  	<div class="panel-footer">
+									<button type="button" class="btn btn-danger center-block" ng-click="readyToggle()">
+										Ready
+									</button>
+							  	</div>
 							</div>
 						</div>
 
@@ -89,34 +111,34 @@
 									<h3 class="panel-title"><b>Game</b></h3>
 								</div>
 								<div class="panel-body">
+									<div class="panel panel-default fjs-game-main">
 
+										<!-- Player Table -->
+										<table class="table table-bordered fjs-game-table">
+											<tr style = "background-color : lightgray">
+												<td> Nick </td>
+												<td> Lives </td>
+												<td> Won/Bet </td>
+												<td> Card </td>
+											</tr>
+											<tr ng-repeat="player in players">
+												<td>{{player.name}}</td>
+												<td>{{player.lives}}</td>
+												<td>{{player.won}} / {{player.bet}}</td>
+												<td>1</td>
+											</tr>
+										</table>
+									</div>
+
+									<!-- Cards section -->
+									<div class="well well-lg" style="text-align:center">
+										Cards
+									</div>
 								</div>
 							</div>
 						</div>
 
-					</div>
-
-					<!-- Row = Players -->
-					<div class="row">
-
-						<!-- Players Panel -->
-						<div class="col-md-3 col-xs-4 login-animate" ng-show="loggedIn == 'yes'">
-							<div class="panel panel-default">
-							  	<div class="panel-heading"  style = "text-align:center">
-					    			<h3 class="panel-title"><b>Players</b></h3>
-							  	</div>
-							  	<div class="panel-body">
-
-							  	</div>
-							  	<div class="panel-footer">
-									<button type="button" class="btn btn-danger center-block">
-										Ready
-									</button>
-							  	</div>
-							</div>
-						</div>
-						
-					</div>
+					</div> <!-- Main row end -->
 
 					<!-- Main Container end -->
 				</div>
