@@ -12,6 +12,24 @@
     font-size: 175%;
 }
 
+.fjs-login-panel{
+    /* Needed so it won't mess with transition */
+    min-height: 176.4px;
+}
+
+.fjs-game-main{
+    height : 300px;
+}
+
+.fjs-game-table{
+    height: 100%;
+    text-align: center;
+}
+
+.table.table-bordered.fjs-game-table td{
+    vertical-align: middle;
+}
+
 /* =============== ANIMATIONS ================ */
 
 .login-animate {
