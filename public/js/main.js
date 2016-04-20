@@ -109,9 +109,15 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 		$scope.me.ready = !$scope.me.ready;
 	}
 
+	//Aux Function
 	$scope.cardIsRed = function(card)
 	{
 		return (card[1] == 'H' || card[1] == 'D');
+	}
+
+	$scope.cardSelect = function (index)
+	{
+		$scope.me.card = $scope.cards[index];
 	}
 
 	// Local player list
@@ -136,8 +142,8 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 
 	// Local player card list
 	$scope.cards = [
-		"4S","5H","6C", "7D"
-	]
+		"4S","5H","6C", "7D", "4H", "5C", "6D", "7S"
+	];
 });
 
 // $(function() {

@@ -31,12 +31,17 @@
 }
 
 .fjs-card{
-    font-size: 800%;
+    font-size: 650%;
     line-height: 100%;
+    cursor: pointer;
 }
 
 .red-card{
     color : red;
+}
+
+.selected-card{
+    color : orange;
 }
 
 .table.table-bordered.fjs-game-table td{

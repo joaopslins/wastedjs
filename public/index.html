@@ -154,10 +154,13 @@
 										<span
 											ng-repeat="card in cards"
 											ng-bind-html = "card | cardFilter"
-											ng-class="cardIsRed(card) ? 'red-card' : '' "
+											ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == me.card}"
+											ng-click = "cardSelect($index)"
 										>
 										</span>
 									</div>
+
+									<pre> {{me}}</pre>
 
 
 								</div>
