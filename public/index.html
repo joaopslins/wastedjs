@@ -8,6 +8,7 @@
 		<!-- Angular -->
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-sanitize.js"></script>
 
  		<!-- jQuery -->
 		<script src="https://code.jquery.com/jquery-2.2.2.js" integrity="sha256-4/zUCqiq0kqxhZIyp4G0Gk+AOtCJsY1TA00k5ClsZYE=" crossorigin="anonymous"></script>
@@ -19,6 +20,8 @@
 		<!-- Source -->
 		<link href="css/main.css" rel="stylesheet">
 		<script src="js/main.js"></script>
+
+		<title>FodinhaJS</title>
 
 	</head>
 
@@ -110,38 +113,59 @@
 								<div class="panel-heading" style = "text-align:center">
 									<h3 class="panel-title"><b>Game</b></h3>
 								</div>
-								<div class="panel-body">
-									<div class="panel panel-default fjs-game-main">
 
-										<!-- Player Table -->
+								<div class="panel-body">
+
+									<!-- Player Scoreboard -->
+									<div class="panel panel-default fjs-game-main">
 										<table class="table table-bordered fjs-game-table">
-											<tr style = "background-color : lightgray">
+											<tr class="table-header">
 												<td> Nick </td>
 												<td> Lives </td>
 												<td> Won/Bet </td>
-												<td> Card </td>
 											</tr>
 											<tr ng-repeat="player in players">
 												<td>{{player.name}}</td>
 												<td>{{player.lives}}</td>
 												<td>{{player.won}} / {{player.bet}}</td>
-												<td>1</td>
 											</tr>
 										</table>
 									</div>
 
-									<!-- Cards section -->
-									<div class="well well-lg" style="text-align:center">
-										Cards
+									<!-- Played cards -->
+									<div class="panel panel-default">
+										<table class ="table table-bordered fjs-player-cards">
+											<tr class="table-header">
+												<td ng-repeat= "player in players" >{{player.name}}</td>
+											</tr>
+											<tr>
+ 												<td
+													class = "fjs-card"
+													ng-repeat = "player in players"
+													ng-bind-html = "player.card | cardFilter"
+													ng-class="cardIsRed(player.card) ? 'red-card' : '' ">
+												</td>
+											</tr>
+										</table>
 									</div>
+
+									<!-- Player hand section -->
+									<div class="well well-lg fjs-card" style="text-align:center" >
+										<span
+											ng-repeat="card in cards"
+											ng-bind-html = "card | cardFilter"
+											ng-class="cardIsRed(card) ? 'red-card' : '' "
+										>
+										</span>
+									</div>
+
+
 								</div>
 							</div>
-						</div>
+						</div> <!-- Game Panel end -->
 
 					</div> <!-- Main row end -->
-
-					<!-- Main Container end -->
-				</div>
+				</div> <!-- Main Container end -->
 			</div>
 		</div>
 

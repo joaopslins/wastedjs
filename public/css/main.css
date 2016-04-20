@@ -18,7 +18,7 @@
 }
 
 .fjs-game-main{
-    height : 300px;
+    height : 250px;
 }
 
 .fjs-game-table{
@@ -26,8 +26,25 @@
     text-align: center;
 }
 
+.fjs-player-cards{
+    text-align: center;
+}
+
+.fjs-card{
+    font-size: 800%;
+    line-height: 100%;
+}
+
+.red-card{
+    color : red;
+}
+
 .table.table-bordered.fjs-game-table td{
     vertical-align: middle;
+}
+
+.table-header{
+    background-color: #f5f5f5;
 }
 
 /* =============== ANIMATIONS ================ */
