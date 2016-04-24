@@ -68,6 +68,7 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 	//login button function
 	$scope.loginToggle = function()
 	{
+		if($scope.me.name == "") return;
 		// If logging in
 		if($scope.loggedIn == "no")
 		{
