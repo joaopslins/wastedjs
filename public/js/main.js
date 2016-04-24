@@ -109,6 +109,12 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 		$scope.me.ready = !$scope.me.ready;
 	}
 
+	//Play card button function
+	$scope.playCard = function()
+	{
+		//TODO play card function
+	}
+
 	//Aux Function
 	$scope.cardIsRed = function(card)
 	{
