@@ -31,8 +31,9 @@
 }
 
 .fjs-card{
+    font-family: 'Dejavu Sans';
     font-size: 650%;
-    line-height: 100%;
+    line-height: 130%;
     cursor: pointer;
 }
 
