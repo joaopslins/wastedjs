@@ -1,3 +1,11 @@
+/* ============== FONT FACE ================= */
+@font-face {
+	font-family: 'Dejavu Sans';
+	src: url('/fonts/DejaVuSans.ttf');
+	/*font-family: 'Symbola';
+	src: url('/fonts/Symbola.ttf');*/
+}
+
 /* =============== UTILITIES ================ */
 
 .not-ready{
