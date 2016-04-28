@@ -151,13 +151,14 @@
 
 									<!-- Player hand section -->
 									<div class="well well-lg" style="text-align:center" >
-										<div class="row fjs-card">
-											<span
+										<div class="row">
+											<div
+												class = "fjs-card fjs-hand"
 												ng-repeat="card in cards"
 												ng-bind-html = "card | cardFilter"
 												ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == me.card}"
 												ng-click = "cardSelect($index)" >
-											</span>
+											</div>
 										</div>
 										<div class="row">
 											<button type="button" class="btn btn-primary center-block" ng-click="playCard()">

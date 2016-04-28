@@ -45,6 +45,10 @@
     cursor: pointer;
 }
 
+.fjs-hand{
+	display: inline-block;
+}
+
 .red-card{
     color : red;
 }
