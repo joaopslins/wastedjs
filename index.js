@@ -59,7 +59,8 @@ io.on('connection', function (socket)
         //Return playerlist to logged in player
         callback(createClientPlayerList());
 
-        //Add new player to server player list
+        //Add new player to server player list and socket
+		socket.name = name;
 		var newPlayer = new Player (name);
         players.push(newPlayer);
 
@@ -79,6 +80,17 @@ io.on('connection', function (socket)
     });
 
 	socket.on('disconnect', function(){
+		//Set name as socket name
+		var name = socket.name;
+		
+        //Remove player from server playlist
+        players = players.filter(function (player)
+        {
+            return player.name != name;
+        });
+
+        //Update removed player to other clients
+        socket.broadcast.emit('playerDisconnect', name);
 	});
 });
 
