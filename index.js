@@ -79,6 +79,21 @@ io.on('connection', function (socket)
         socket.broadcast.emit('playerDisconnect', name);
     });
 
+	socket.on('ready', function(client)
+	{		
+		//Update player in server player list
+		for(i in players)
+		{
+			if (players[i].name == client.name)
+			{
+				players[i].ready = client.ready;
+				socket.broadcast.emit('updateClientReady', client);
+				//Probably unnecessary
+				break;
+			}
+		}
+	});
+	
 	socket.on('disconnect', function(){
 		//Set name as socket name
 		var name = socket.name;

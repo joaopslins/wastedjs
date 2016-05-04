@@ -148,7 +148,14 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 	// Ready button function
 	$scope.readyToggle = function()
 	{
+		//Toggle ready variable
 		$scope.me.ready = !$scope.me.ready;
+		
+		// Update to server
+		socket.emit('ready', {
+			name: $scope.me.name,
+			ready: $scope.me.ready
+		});
 	}
 
 	//Play card button function
@@ -180,6 +187,18 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 		{
 			return player.name != dcName;
 		});
+	});
+	
+	socket.on('updateClientReady', function(client)
+	{
+		//Update player ready in local player list
+		for(i in $scope.players)
+		{
+			if ($scope.players[i].name == client.name)
+			{
+				$scope.players[i].ready = client.ready;
+			}
+		}
 	});
 });
 
