@@ -1,5 +1,31 @@
 var fodinhaJS = angular.module ("fodinhaJSapp", ["ngAnimate", "ngSanitize"]);
 
+// From http://briantford.com/blog/angular-socket-io
+fodinhaJS.factory("socket", function ($rootScope) {
+	var socket = io.connect();
+
+	return {
+		on: function (eventName, callback) {
+			socket.on(eventName, function () {
+				var args = arguments;
+				$rootScope.$apply(function () {
+					callback.apply(socket, args);
+				});
+			});
+		},
+		emit: function (eventName, data, callback) {
+			socket.emit(eventName, data, function () {
+				var args = arguments;
+				$rootScope.$apply(function () {
+					if (callback) {
+						callback.apply(socket, args);
+					}
+				});
+			})
+		}
+	};
+});
+
 fodinhaJS.filter('cardFilter', function($sce)
 {
 	return function(input){
@@ -52,18 +78,27 @@ fodinhaJS.filter('cardFilter', function($sce)
 	};
 });
 
-fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
+fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 {
 	//Local variables
 	$scope.loggedIn = 'no';
 	$scope.me = {
 		name : "",
 		ready : false,
-		lives : 1,
-		won : 2,
+		lives : 3,
+		won : 0,
 		bet : 0,
 		card : ''
 	}
+
+	// Local player list
+	$scope.players = [
+	];
+
+	// Local player card list
+	$scope.cards = [
+		"4S","5H","6C", "7D", "4H", "5C", "6D", "7S"
+	];
 
 	//login button function
 	$scope.loginToggle = function()
@@ -78,9 +113,13 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 				$scope.loggedIn = "yes";
 			}, 550);
 
-			//Add new player
-			// TODO USING NODE SERVER
-			$scope.players.push($scope.me);
+			//Login into server
+			socket.emit('login', $scope.me.name, function(playerList)
+			{
+				//Update local player list
+				$scope.players = playerList;
+				$scope.players.push($scope.me);
+			});
 
 		}
 		// If logging out
@@ -92,22 +131,31 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 				$scope.loggedIn = "no";
 			}, 550);
 
-			//Remove current player
-			// TODO USING NODE SERVER
-			$scope.players = $scope.players.filter(function (player)
-			{
-				return player != $scope.me;
-			});
-		}
+			//Logout from server and reset local player list
+			socket.emit('logout', $scope.me.name);
+			$scope.players = [];
 
-		// Reset ready status
-		$scope.me.ready = false;
+			//Reset Player Configs
+			$scope.me.name = "",
+			$scope.me.ready = false,
+			$scope.me.lives = 3,
+			$scope.me.won = 0,
+			$scope.me.bet = 0,
+			$scope.me.card = ''
+		}
 	}
 
 	// Ready button function
 	$scope.readyToggle = function()
 	{
+		//Toggle ready variable
 		$scope.me.ready = !$scope.me.ready;
+		
+		// Update to server
+		socket.emit('ready', {
+			name: $scope.me.name,
+			ready: $scope.me.ready
+		});
 	}
 
 	//Play card button function
@@ -116,41 +164,42 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout)
 		//TODO play card function
 	}
 
-	//Aux Function
+	//Simple function if card is red
 	$scope.cardIsRed = function(card)
 	{
 		return (card[1] == 'H' || card[1] == 'D');
 	}
 
+	//Select card function
 	$scope.cardSelect = function (index)
 	{
 		$scope.me.card = $scope.cards[index];
 	}
 
-	// Local player list
-	$scope.players = [
-	{
-		name : "Teste1",
-		ready : false,
-		lives : 3,
-		won : 2,
-		bet : 0,
-		card : "4C",
-	},
-	{
-		name : "Teste2",
-		ready : false,
-		lives : 2,
-		won : 2,
-		bet : 0,
-		card : "7H"
-	}
-	];
+	//Socket listener events
+	socket.on('playerConnect', function(newPlayer){
+		$scope.players.push(newPlayer);
+	});
 
-	// Local player card list
-	$scope.cards = [
-		"4S","5H","6C", "7D", "4H", "5C", "6D", "7S"
-	];
+	socket.on('playerDisconnect', function(dcName)
+	{
+		$scope.players = $scope.players.filter(function(player)
+		{
+			return player.name != dcName;
+		});
+	});
+	
+	socket.on('updateClientReady', function(client)
+	{
+		//Update player ready in local player list
+		for(i in $scope.players)
+		{
+			if ($scope.players[i].name == client.name)
+			{
+				$scope.players[i].ready = client.ready;
+			}
+		}
+	});
 });
 
 // $(function() {

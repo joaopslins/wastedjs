@@ -2,8 +2,12 @@
 
 var Deck = require ('./deck');
 
-var Player = function () {
+var Player = function (name) {
+    this.name = name;
+    this.ready = false;
     this.lives = Player.prototype.LIVES;
+    this.won = 0;
+    this.bet = 0;
 
     this.hand = new Deck();
     this.chosen = false;
