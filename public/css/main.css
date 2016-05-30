@@ -108,3 +108,18 @@
   opacity:1;
   max-height:30px;
 }
+
+.alert.ng-hide-add,
+.alert.ng-hide-remove {
+    -moz-transition: 0.5s linear all;
+    -o-transition: 0.5s linear all;
+    -webkit-transition: 0.5s linear all;
+    transition: 0.5s linear all;
+
+    display: block !important;
+    opacity: 1;
+}
+
+.alert.ng-hide {
+    opacity: 0;
+}

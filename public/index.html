@@ -84,6 +84,13 @@
 								</div>
 							</div>
 
+							<div class="alert alert-danger" style="text-align:center" ng-show="loginError">
+							    <button type="button" class="close" data-dismiss="alert">x</button>
+							    <strong>Can't login! </strong>
+								<br />
+							    Nick was already taken!
+							</div>
+
 							<!-- Player Panel -->
 							<div class="panel panel-default login-animate" ng-show="loggedIn == 'yes'">
 

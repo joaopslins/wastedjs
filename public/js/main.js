@@ -81,6 +81,7 @@ fodinhaJS.filter('cardFilter', function($sce)
 fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 {
 	//Local variables
+	$scope.loginError = false;
 	$scope.loggedIn = 'no';
 	$scope.me = {
 		name : "",
@@ -103,24 +104,39 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 	//login button function
 	$scope.loginToggle = function()
 	{
+		//Reset error status
+		$scope.loginError = false;
+
 		if($scope.me.name == "") return;
 		// If logging in
 		if($scope.loggedIn == "no")
 		{
 			// Animation
 			$scope.loggedIn = false;
-			$timeout( function() {
-				$scope.loggedIn = "yes";
-			}, 550);
 
-			//Login into server
-			socket.emit('login', $scope.me.name, function(playerList)
+			//Tries to login into server
+			socket.emit('login', $scope.me.name, function(data)
 			{
-				//Update local player list
-				$scope.players = playerList;
-				$scope.players.push($scope.me);
-			});
+				if(data.success)
+				{
+					//Update local player list
+					$scope.players = data.playerList;
+					$scope.players.push($scope.me);
 
+					//Login
+					$timeout( function() {
+						$scope.loggedIn = "yes";
+					}, 550);
+				}
+				else
+				{
+					//Failed to login
+					$timeout( function() {
+						$scope.loggedIn = "no";
+						$scope.loginError = true;
+					}, 550);
+				}
+			});
 		}
 		// If logging out
 		else if($scope.loggedIn == "yes")
@@ -150,7 +166,7 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 	{
 		//Toggle ready variable
 		$scope.me.ready = !$scope.me.ready;
-		
+
 		// Update to server
 		socket.emit('ready', {
 			name: $scope.me.name,
@@ -188,7 +204,7 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 			return player.name != dcName;
 		});
 	});
-	
+
 	socket.on('updateClientReady', function(client)
 	{
 		//Update player ready in local player list

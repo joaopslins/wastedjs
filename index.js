@@ -49,6 +49,18 @@ var createClientPlayerList = function()
     return clientPlayerList;
 };
 
+var checkName = function(name){
+    for(i in players)
+    {
+        if(players[i].name == name)
+        {
+            return false;
+        }
+    }
+
+    return true;
+};
+
 //Server connection code
 io.on('connection', function (socket)
 {
@@ -56,16 +68,23 @@ io.on('connection', function (socket)
 
 	socket.on('login', function (name, callback)
 	{
-        //Return playerlist to logged in player
-        callback(createClientPlayerList());
+        success = checkName(name);
 
-        //Add new player to server player list and socket
-		socket.name = name;
-		var newPlayer = new Player (name);
-        players.push(newPlayer);
+        //Return playerlist and success to requested player
+        callback({
+            "playerList" : createClientPlayerList(),
+            "success" : success
+        });
 
-        //Update new player to other clients
-        socket.broadcast.emit('playerConnect',convertPlayer(newPlayer));
+        if(success){
+            //Add new player to server player list and socket
+    		socket.name = name;
+    		var newPlayer = new Player (name);
+            players.push(newPlayer);
+
+            //Update new player to other clients
+            socket.broadcast.emit('playerConnect',convertPlayer(newPlayer));
+        }
 	});
 
     socket.on('logout', function(name){
@@ -80,7 +99,7 @@ io.on('connection', function (socket)
     });
 
 	socket.on('ready', function(client)
-	{		
+	{
 		//Update player in server player list
 		for(i in players)
 		{
@@ -93,11 +112,11 @@ io.on('connection', function (socket)
 			}
 		}
 	});
-	
+
 	socket.on('disconnect', function(){
 		//Set name as socket name
 		var name = socket.name;
-		
+
         //Remove player from server playlist
         players = players.filter(function (player)
         {
