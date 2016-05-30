@@ -65,6 +65,27 @@
     background-color: #f5f5f5;
 }
 
+.start-disabled{
+	background-color: lightgray;
+	cursor: not-allowed;
+}
+
+.start-button{
+	color: white;
+	background-color: gold;
+	border-color: goldenrod;
+	cursor: default;
+}
+
+.start-button:hover{
+	color: white;
+	background-color: orange;
+}
+
+.start-button:active, .start-button:focus{
+	color:white;
+}
+
 /* =============== ANIMATIONS ================ */
 
 .login-animate {

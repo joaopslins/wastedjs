@@ -81,6 +81,8 @@ fodinhaJS.filter('cardFilter', function($sce)
 fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 {
 	//Local variables
+	$scope.readyToStart = false;
+	$scope.firstPlayer = false;
 	$scope.loginError = false;
 	$scope.loggedIn = 'no';
 	$scope.me = {
@@ -115,12 +117,16 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 			$scope.loggedIn = false;
 
 			//Tries to login into server
+			//		data = {playerList,success}
 			socket.emit('login', $scope.me.name, function(data)
 			{
 				if(data.success)
 				{
 					//Update local player list
 					$scope.players = data.playerList;
+					if($scope.players.length == 0){
+						$scope.firstPlayer = true;
+					}
 					$scope.players.push($scope.me);
 
 					//Login
@@ -152,18 +158,22 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 			$scope.players = [];
 
 			//Reset Player Configs
-			$scope.me.name = "",
-			$scope.me.ready = false,
-			$scope.me.lives = 3,
-			$scope.me.won = 0,
-			$scope.me.bet = 0,
-			$scope.me.card = ''
+			$scope.me.name = "";
+			$scope.me.ready = false;
+			$scope.me.lives = 3;
+			$scope.me.won = 0;
+			$scope.me.bet = 0;
+			$scope.me.card = '';
+
+			$scope.firstPlayer = false;
 		}
 	}
 
 	// Ready button function
 	$scope.readyToggle = function()
 	{
+		let aux = true;
+
 		//Toggle ready variable
 		$scope.me.ready = !$scope.me.ready;
 
@@ -172,6 +182,17 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 			name: $scope.me.name,
 			ready: $scope.me.ready
 		});
+
+		//Check if everyone is ready
+		for(i in $scope.players)
+		{
+			if(!$scope.players[i].ready)
+			{
+				aux = false;
+			}
+		}
+
+		$scope.readyToStart = aux;
 	}
 
 	//Play card button function
@@ -195,6 +216,8 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 	//Socket listener events
 	socket.on('playerConnect', function(newPlayer){
 		$scope.players.push(newPlayer);
+
+		$scope.readyToStart = false;
 	});
 
 	socket.on('playerDisconnect', function(dcName)
@@ -203,18 +226,32 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 		{
 			return player.name != dcName;
 		});
+
+		if($scope.players[0].name == $scope.me.name)
+		{
+			$scope.firstPlayer = true;
+		}
 	});
 
 	socket.on('updateClientReady', function(client)
 	{
-		//Update player ready in local player list
+		let aux = true;
 		for(i in $scope.players)
 		{
+			//Update player ready in local player list
 			if ($scope.players[i].name == client.name)
 			{
 				$scope.players[i].ready = client.ready;
 			}
+
+			//Check if everyone is ready
+			if(!$scope.players[i].ready)
+			{
+				aux = false;
+			}
 		}
+
+		$scope.readyToStart = aux;
 	});
 });
 
