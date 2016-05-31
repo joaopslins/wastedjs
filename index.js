@@ -7,6 +7,7 @@ var io = require ('socket.io') (server);
 var Card = require ('./game/card');
 var Deck = require ('./game/deck');
 var Player = require ('./game/player');
+var Game = require ('./game/game');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -22,6 +23,7 @@ server.listen(app.get('port'), function () {
 
 //Server Variables
 var players = [];
+var game;
 
 var convertPlayer = function(player)
 {
@@ -49,7 +51,7 @@ var createClientPlayerList = function()
     return clientPlayerList;
 };
 
-var checkName = function(name){
+var isNameAvailable = function(name){
     for(i in players)
     {
         if(players[i].name == name)
@@ -68,7 +70,15 @@ io.on('connection', function (socket)
 
 	socket.on('login', function (name, callback)
 	{
-        success = checkName(name);
+        var success = 0;
+        //If name not available
+        if(!isNameAvailable(name)){
+            success = 1;
+        }
+        //If game is full
+        else if(players.length == 5){
+            success = 2;
+        }
 
         //Return playerlist and success to requested player
         callback({
@@ -76,14 +86,14 @@ io.on('connection', function (socket)
             "success" : success
         });
 
-        if(success){
+        if(success == 0){
             //Add new player to server player list and socket
     		socket.name = name;
     		var newPlayer = new Player (name);
             players.push(newPlayer);
 
             //Update new player to other clients
-            socket.broadcast.emit('playerConnect',convertPlayer(newPlayer));
+            socket.broadcast.emit('player-connect',convertPlayer(newPlayer));
         }
 	});
 
@@ -95,9 +105,10 @@ io.on('connection', function (socket)
         });
 
         //Update removed player to other clients
-        socket.broadcast.emit('playerDisconnect', name);
+        socket.broadcast.emit('player-disconnect', name);
     });
 
+    // Client = {name,ready}
 	socket.on('ready', function(client)
 	{
 		//Update player in server player list
@@ -106,12 +117,16 @@ io.on('connection', function (socket)
 			if (players[i].name == client.name)
 			{
 				players[i].ready = client.ready;
-				socket.broadcast.emit('updateClientReady', client);
+				socket.broadcast.emit('update-client-ready', client);
 				//Probably unnecessary
 				break;
 			}
 		}
 	});
+
+    socket.on('start-game', function(){
+
+    });
 
 	socket.on('disconnect', function(){
 		//Set name as socket name
@@ -124,7 +139,7 @@ io.on('connection', function (socket)
         });
 
         //Update removed player to other clients
-        socket.broadcast.emit('playerDisconnect', name);
+        socket.broadcast.emit('player-disconnect', name);
 	});
 });
 

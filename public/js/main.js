@@ -26,7 +26,7 @@ fodinhaJS.factory("socket", function ($rootScope) {
 	};
 });
 
-fodinhaJS.filter('cardFilter', function($sce)
+fodinhaJS.filter('cardFilter', function()
 {
 	return function(input){
 		var result = "";
@@ -78,9 +78,10 @@ fodinhaJS.filter('cardFilter', function($sce)
 	};
 });
 
-fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
+fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, $sce, socket)
 {
 	//Local variables
+	$scope.loginErrorMessage = "";
 	$scope.readyToStart = false;
 	$scope.firstPlayer = false;
 	$scope.loginError = false;
@@ -120,7 +121,7 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 			//		data = {playerList,success}
 			socket.emit('login', $scope.me.name, function(data)
 			{
-				if(data.success)
+				if(data.success == 0)
 				{
 					//Update local player list
 					$scope.players = data.playerList;
@@ -136,8 +137,20 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 				}
 				else
 				{
-					//Failed to login
 					$timeout( function() {
+						//Nick taken
+						if(data.success == 1)
+						{
+							$scope.loginErrorMessage =  '<strong>Cannot login!</strong>'+
+														'<br />Nick was already taken!'
+						}
+						//Room is full
+						else if(data.success == 2)
+						{
+							$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+														'<br />Room is full!'
+						}
+
 						$scope.loggedIn = "no";
 						$scope.loginError = true;
 					}, 550);
@@ -183,6 +196,12 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 			ready: $scope.me.ready
 		});
 
+		//At least 2 players
+		if($scope.players.length == 1)
+		{
+			aux = false;
+		}
+
 		//Check if everyone is ready
 		for(i in $scope.players)
 		{
@@ -213,14 +232,23 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 		$scope.me.card = $scope.cards[index];
 	}
 
+	$scope.startGame = function()
+	{
+		if($scope.readyToStart)
+		{
+			socket.emit('start-game');
+		}
+	}
+
 	//Socket listener events
-	socket.on('playerConnect', function(newPlayer){
+	socket.on('player-connect', function(newPlayer)
+	{
 		$scope.players.push(newPlayer);
 
 		$scope.readyToStart = false;
 	});
 
-	socket.on('playerDisconnect', function(dcName)
+	socket.on('player-disconnect', function(dcName)
 	{
 		$scope.players = $scope.players.filter(function(player)
 		{
@@ -231,9 +259,11 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 		{
 			$scope.firstPlayer = true;
 		}
+
+		$scope.readyToStart = false;
 	});
 
-	socket.on('updateClientReady', function(client)
+	socket.on('update-client-ready', function(client)
 	{
 		let aux = true;
 		for(i in $scope.players)
@@ -249,6 +279,12 @@ fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, socket)
 			{
 				aux = false;
 			}
+		}
+
+		//At least 2 players
+		if($scope.players.length == 1)
+		{
+			aux = false;
 		}
 
 		$scope.readyToStart = aux;
