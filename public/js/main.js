@@ -1,7 +1,7 @@
-var fodinhaJS = angular.module ("fodinhaJSapp", ["ngAnimate", "ngSanitize"]);
+var wastedJS = angular.module ("wastedJSapp", ["ngAnimate", "ngSanitize"]);
 
 // From http://briantford.com/blog/angular-socket-io
-fodinhaJS.factory("socket", function ($rootScope) {
+wastedJS.factory("socket", function ($rootScope) {
 	var socket = io.connect();
 
 	return {
@@ -26,7 +26,7 @@ fodinhaJS.factory("socket", function ($rootScope) {
 	};
 });
 
-fodinhaJS.filter('cardFilter', function()
+wastedJS.filter('cardFilter', function()
 {
 	return function(input){
 		var result = "";
@@ -78,7 +78,7 @@ fodinhaJS.filter('cardFilter', function()
 	};
 });
 
-fodinhaJS.controller("fodinhaJSctrl", function($scope, $timeout, $sce, socket)
+wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 {
 	//Local variables
 	$scope.loginErrorMessage = "";

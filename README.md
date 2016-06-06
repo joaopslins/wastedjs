@@ -1,1 +1,1 @@
-"# fodinhajs" 
+"# WastedJS"
