@@ -1,1 +1,1 @@
-"# WastedJS"
+# WastedJS
