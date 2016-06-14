@@ -78,7 +78,7 @@ wastedJS.filter('cardFilter', function()
 	};
 });
 
-wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
+wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 {
 	//Local variables
 	$scope.loginErrorMessage = "";
@@ -86,6 +86,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 	$scope.firstPlayer = false;
 	$scope.loginError = false;
 	$scope.loggedIn = 'no';
+	$scope.game = false;
 	$scope.me = {
 		name : "",
 		ready : false,
@@ -94,6 +95,8 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 		bet : 0,
 		card : ''
 	}
+
+	$scope.myTurn = false;
 
 	// Local player list
 	$scope.players = [
@@ -160,25 +163,39 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 		// If logging out
 		else if($scope.loggedIn == "yes")
 		{
-			// Animation
-			$scope.loggedIn = false;
-			$timeout( function() {
-				$scope.loggedIn = "no";
-			}, 550);
+			let exit = true;
 
-			//Logout from server and reset local player list
-			socket.emit('logout', $scope.me.name);
-			$scope.players = [];
+			if($scope.game){
+				if($window.confirm("This will end the game, are you sure?")){
+					exit = true;
+				}else{
+					exit = false;
+				}
+			}
 
-			//Reset Player Configs
-			$scope.me.name = "";
-			$scope.me.ready = false;
-			$scope.me.lives = 3;
-			$scope.me.won = 0;
-			$scope.me.bet = 0;
-			$scope.me.card = '';
+			if(exit)
+			{
+				// Animation
+				$scope.loggedIn = false;
+				$timeout( function() {
+					$scope.loggedIn = "no";
+				}, 550);
 
-			$scope.firstPlayer = false;
+				//Logout from server and reset local player list
+				socket.emit('logout');
+				$scope.players = [];
+
+				//Reset Player Configs
+				$scope.me.name = "";
+				$scope.me.ready = false;
+				$scope.me.lives = 3;
+				$scope.me.won = 0;
+				$scope.me.bet = 0;
+				$scope.me.card = '';
+
+				$scope.firstPlayer = false;
+				$scope.game = false;
+			}
 		}
 	}
 
@@ -217,6 +234,9 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 	//Play card button function
 	$scope.playCard = function()
 	{
+		if($scope.myTurn){
+
+		}
 		//TODO play card function
 	}
 
@@ -232,6 +252,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 		$scope.me.card = $scope.cards[index];
 	}
 
+	//Start game - Only for host player
 	$scope.startGame = function()
 	{
 		if($scope.readyToStart)
@@ -261,6 +282,12 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 		}
 
 		$scope.readyToStart = false;
+
+		//If ongoing game
+		if($scope.game){
+			$scope.game = false;
+			$scope.me.ready = false;
+		}
 	});
 
 	socket.on('update-client-ready', function(client)
@@ -288,6 +315,28 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $sce, socket)
 		}
 
 		$scope.readyToStart = aux;
+	});
+
+	socket.on('match-start-notification', function(playerToPlay){
+		socket.emit('request-cards', null, function(data){
+			$scope.cards = data.cards;
+		});
+
+		$scope.game = true;
+
+		//Reset Player Config
+		$scope.me.lives = 3;
+		$scope.me.won = 0;
+		$scope.me.bet = 0;
+		$scope.me.card = '';
+
+		if(playerToPlay == $scope.me.name){
+			$scope.myTurn = true;
+		}
+		else{
+			$scope.myTurn = false;
+		}
+
 	});
 });
 

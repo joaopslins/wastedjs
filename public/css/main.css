@@ -74,7 +74,7 @@
 	color: white;
 	background-color: gold;
 	border-color: goldenrod;
-	cursor: default;
+	cursor: pointer;
 }
 
 .start-button:hover{
@@ -84,6 +84,33 @@
 
 .start-button:active, .start-button:focus{
 	color:white;
+}
+
+.play-disabled{
+	color: white;
+	background-color: lightgray;
+	cursor: not-allowed;
+}
+
+.play-disabled:hover, .play-disabled:focus
+{
+	color:white;
+	border-color:darkgray;
+	background-color: gray;
+}
+
+.play-active{
+	color: white;
+	background-color: dodgerblue;
+	border-color: midnightblue;
+	cursor: pointer;
+}
+
+.play-active:hover, .play-active:focus
+{
+	color:white;
+	border-color:midnightblue;
+	background-color: mediumblue;
 }
 
 /* =============== ANIMATIONS ================ */

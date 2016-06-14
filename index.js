@@ -23,7 +23,7 @@ server.listen(app.get('port'), function () {
 
 //Server Variables
 var players = [];
-var game;
+var game = null;
 
 var convertPlayer = function(player)
 {
@@ -63,6 +63,30 @@ var isNameAvailable = function(name){
     return true;
 };
 
+var disconnect_C = function(socket){
+    //Set name as socket name
+	var name = socket.name;
+
+    //Remove player from server playlist
+    players = players.filter(function (player)
+    {
+        return player.name != name;
+    });
+
+    //Undo game
+    if(game != null){
+        game = null;
+
+        //Undo ready status
+        for(var i in players){
+            players[i].ready = false;
+        }
+    }
+
+    //Update removed player to other clients
+    socket.broadcast.emit('player-disconnect', name);
+}
+
 //Server connection code
 io.on('connection', function (socket)
 {
@@ -97,15 +121,8 @@ io.on('connection', function (socket)
         }
 	});
 
-    socket.on('logout', function(name){
-        //Remove player from server playlist
-        players = players.filter(function (player)
-        {
-            return player.name != name;
-        });
-
-        //Update removed player to other clients
-        socket.broadcast.emit('player-disconnect', name);
+    socket.on('logout', function(){
+        disconnect_C(socket);
     });
 
     // Client = {name,ready}
@@ -124,23 +141,22 @@ io.on('connection', function (socket)
 		}
 	});
 
+    //Host started game
     socket.on('start-game', function(){
+        game = new Game (players);
+        io.emit('match-start-notification', game.startMatchPlayer);
+    });
 
+    //Client requested his cards
+    socket.on('request-cards', function(data, callback){
+        callback({
+            'cards' : game.getCardsFromPlayer(socket.name)
+        });
     });
 
 	socket.on('disconnect', function(){
-		//Set name as socket name
-		var name = socket.name;
-
-        //Remove player from server playlist
-        players = players.filter(function (player)
-        {
-            return player.name != name;
-        });
-
-        //Update removed player to other clients
-        socket.broadcast.emit('player-disconnect', name);
-	});
+        disconnect_C(socket);
+    });
 });
 
 

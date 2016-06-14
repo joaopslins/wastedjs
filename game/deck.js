@@ -65,7 +65,21 @@ Deck.prototype.toString = function() {
     return this.cards.toString();
 };
 
+Deck.prototype.getCards = function(){
+    var ret = [];
+    for(var i = 0; i < this.cards.length; i++){
+        ret.push(this.cards[i].toString());
+    }
+
+    return ret;
+};
+
 Deck.prototype.distribute = function(players, qty) {
+    //Reset players' hands when distribute
+    for(var i in players){
+        players[i].hand = new Deck();
+    }
+
     for (var times = 0; times < qty; times++) {
         for(var i in players) {
             var player = players[i];

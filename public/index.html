@@ -104,13 +104,15 @@
 
 								<!-- Ready Button -->
 							  	<div class="panel-footer">
-									<button type="button" class="btn btn-danger center-block" ng-click="readyToggle()">
+									<button type="button" class="btn btn-danger center-block"
+										ng-click="readyToggle()"
+										ng-show="!game">
 										Ready
 									</button>
 									<br />
 									<button type="button" class="btn login-animate start-disabled center-block"
 										ng-class="{'start-button' : readyToStart}"
-										ng-show="firstPlayer"
+										ng-show="firstPlayer && !game"
 										ng-click="startGame()">
 										Start Game
 									</button>
@@ -172,7 +174,9 @@
 											</div>
 										</div>
 										<div class="row">
-											<button type="button" class="btn btn-primary center-block" ng-click="playCard()">
+											<button type="button" class="btn center-block"
+												ng-click="playCard()"
+												ng-class="{'play-active': myTurn, 'play-disabled':!myTurn}">
 												Play
 											</button>
 										</div>
