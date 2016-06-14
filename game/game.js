@@ -25,7 +25,6 @@ Game.prototype.startMatch = function(matchNumber){
 
         player.won = 0;
         player.bet = 0;
-        player.chosen = false;
     }
 
     //Distribute cards
@@ -53,12 +52,26 @@ Game.prototype.getCardsFromPlayer = function(playerName){
     return player.hand.getCards();
 };
 
-Game.prototype.bet = function(name, bet){
-    for (var i in this.players){
-        if(this.players[i].name == name){
-            this.players[i].bet = bet;
-        }
+Game.prototype.setNextPlayer = function(){
+    var index = this.getPlayerIndex(this.roundPlayer);
+    index++;
+
+    if(index == this.players.length){
+        index = 0;
     }
+
+    this.roundPlayer = this.players[index].name;
+}
+
+Game.prototype.playerBet = function(name, bet){
+    this.players[this.getPlayerIndex(name)].bet = bet;
+
+    this.setNextPlayer();
+
+    if(this.roundPlayer == this.startRoundPlayer){
+        this.phase = "play";
+    }
+
 };
 
 module.exports = Game;

@@ -44,13 +44,10 @@ Deck.prototype.push = function(card) {
     this.cards.push(card);
 };
 
-Deck.prototype.remove = function(index) {
-    var tail = this.cards.splice(index);
-    var card = tail.shift();
-
-    this.cards.concat(tail);
-
-    return card;
+Deck.prototype.remove = function(choice) {
+    this.cards = this.cards.filter(function(card) {
+        return card.toString() != choice
+    });
 };
 
 Deck.prototype.size = function() {

@@ -162,6 +162,15 @@
 										</table>
 									</div>
 
+									<div class="well" ng-show="phase == 'bet' && myTurn" style="text-align:center">
+										<h4> Bet! </h4>
+										<button type="button" class="btn btn-primary"
+												ng-repeat="bet in betOptions"
+												ng-click="betClick($index)">
+											{{bet}}
+										</button>
+									</div>
+
 									<!-- Player hand section -->
 									<div class="well well-lg" style="text-align:center" >
 										<div class="row">
@@ -176,7 +185,7 @@
 										<div class="row">
 											<button type="button" class="btn center-block"
 												ng-click="playCard()"
-												ng-class="{'play-active': myTurn, 'play-disabled':!myTurn}">
+												ng-class="{'play-active': (myTurn && phase == 'play'), 'play-disabled':!(myTurn && phase == 'play')}">
 												Play
 											</button>
 										</div>

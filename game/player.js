@@ -10,7 +10,6 @@ var Player = function (name) {
     this.bet = 0;
 
     this.hand = new Deck();
-    this.chosen = false;
 }
 
 Player.prototype.LIVES = 3;
@@ -19,15 +18,8 @@ Player.prototype.takeCard = function(card) {
     this.hand.push(card);
 };
 
-Player.prototype.play = function() {
-    var card = this.hand.remove(this.chosen);
-    this.chosen = false;
-
-    return card;
-};
-
-Player.prototype.choose = function(choice) {
-    this.chosen = choice;
+Player.prototype.play = function(cardName) {
+    this.hand.remove(cardName);
 };
 
 Player.prototype.toString = function() {

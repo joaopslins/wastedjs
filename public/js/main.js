@@ -87,6 +87,8 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	$scope.loginError = false;
 	$scope.loggedIn = 'no';
 	$scope.game = false;
+	$scope.myTurn = false;
+	$scope.phase = false;
 	$scope.me = {
 		name : "",
 		ready : false,
@@ -96,8 +98,6 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		card : ''
 	}
 
-	$scope.myTurn = false;
-
 	// Local player list
 	$scope.players = [
 	];
@@ -106,6 +106,9 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	$scope.cards = [
 		"4S","5H","6C", "7D", "4H", "5C", "6D", "7S"
 	];
+
+	//Bet options
+	$scope.betOptions = [];
 
 	//login button function
 	$scope.loginToggle = function()
@@ -240,6 +243,14 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		//TODO play card function
 	}
 
+	$scope.betClick = function(index){
+		bet = $scope.betOptions[index];
+
+		socket.emit('player-bet', bet);
+		$scope.myTurn = false;
+		$scope.me.bet = bet;
+	}
+
 	//Simple function if card is red
 	$scope.cardIsRed = function(card)
 	{
@@ -320,9 +331,16 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	socket.on('match-start-notification', function(playerToPlay){
 		socket.emit('request-cards', null, function(data){
 			$scope.cards = data.cards;
+			$scope.matchNumber = $scope.cards.length;
+
+			for(var i = 0; i < $scope.matchNumber; i++){
+				$scope.betOptions.push(i);
+			}
+			$scope.betOptions.push($scope.matchNumber);
 		});
 
 		$scope.game = true;
+		$scope.phase = "bet";
 
 		//Reset Player Config
 		$scope.me.lives = 3;
@@ -336,22 +354,25 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		else{
 			$scope.myTurn = false;
 		}
+	});
 
+	socket.on('bet-update', function(bet, playerWhoBet, nextPlayer, startPlayPhase){
+		for (let i in $scope.players){
+			if($scope.players[i].name == playerWhoBet){
+				$scope.players[i].bet = bet;
+				break;
+			}
+		}
+
+		if($scope.me.name == nextPlayer){
+			$scope.myTurn = true;
+		}
+		else{
+			$scope.myTurn = false;
+		}
+
+		if(startPlayPhase){
+			$scope.phase = "play";
+		}
 	});
 });
-
-// $(function() {
-// 	var $button = $("#button");
-//
-// 	var socket = io(window.location.host);
-//
-// 	$button.click( function()
-// 	{
-// 		socket.emit('send message');
-// 	});
-//
-// 	socket.on('update message', function(data)
-// 	{
-// 		$message.text(data);
-// 	});
-// });

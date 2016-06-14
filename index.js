@@ -77,9 +77,14 @@ var disconnect_C = function(socket){
     if(game != null){
         game = null;
 
-        //Undo ready status
+        //Reset players
         for(var i in players){
-            players[i].ready = false;
+            var player = players[i]
+
+            player.ready = false;
+            player.lives = 3;
+            player.won = 0;
+            player.bet = 0;
         }
     }
 
@@ -141,6 +146,13 @@ io.on('connection', function (socket)
 		}
 	});
 
+    socket.on('player-bet', function(bet){
+        game.playerBet(socket.name, bet);
+        var startPlayPhase = game.phase == "play";
+
+        io.emit('bet-update', bet, socket.name, game.roundPlayer, startPlayPhase);
+    });
+
     //Host started game
     socket.on('start-game', function(){
         game = new Game (players);
@@ -158,14 +170,3 @@ io.on('connection', function (socket)
         disconnect_C(socket);
     });
 });
-
-
-/*
-io.sockets.emit() - send to all connected clients
-io.sockets.on() - initial connection from a client.
-
-socket.on() - event listener, can be called on client to execute on server
-socket.emit() - send to client who sent the message
-socket.broadcast.emit() - send to all connected clients except the one that sent the message
-
-*/
