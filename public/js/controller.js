@@ -1,83 +1,3 @@
-var wastedJS = angular.module ("wastedJSapp", ["ngAnimate", "ngSanitize"]);
-
-// From http://briantford.com/blog/angular-socket-io
-wastedJS.factory("socket", function ($rootScope) {
-	var socket = io.connect();
-
-	return {
-		on: function (eventName, callback) {
-			socket.on(eventName, function () {
-				var args = arguments;
-				$rootScope.$apply(function () {
-					callback.apply(socket, args);
-				});
-			});
-		},
-		emit: function (eventName, data, callback) {
-			socket.emit(eventName, data, function () {
-				var args = arguments;
-				$rootScope.$apply(function () {
-					if (callback) {
-						callback.apply(socket, args);
-					}
-				});
-			})
-		}
-	};
-});
-
-wastedJS.filter('cardFilter', function()
-{
-	return function(input){
-		var result = "";
-		if(input == "") return "&#x1F0A0"
-
-		switch (input[1]){
-			case 'S':
-				result = "&#x1F0A";
-				break;
-			case 'H':
-				result = "&#x1F0B";
-				break;
-			case 'C':
-				result = "&#x1F0D";
-				break;
-			case 'D':
-				result = "&#x1F0C";
-				break;
-			default:
-				result = "&#1F0A0";
-		}
-
-		switch(input[0]){
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-				result += input[0];
-				break;
-			case 'Q':
-				result += "D";
-				break;
-			case 'J':
-				result += "B";
-				break;
-			case 'K':
-				result += "E";
-				break;
-			case 'A':
-				result += "1";
-				break;
-			default:
-				break;
-		}
-
-		return result;
-	};
-});
-
 wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 {
 	//Local variables
@@ -94,9 +14,9 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		ready : false,
 		lives : 3,
 		won : 0,
-		bet : 0,
+		bet : '-',
 		card : ''
-	}
+	};
 
 	// Local player list
 	$scope.players = [
@@ -193,7 +113,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 				$scope.me.ready = false;
 				$scope.me.lives = 3;
 				$scope.me.won = 0;
-				$scope.me.bet = 0;
+				$scope.me.bet = '-';
 				$scope.me.card = '';
 
 				$scope.firstPlayer = false;
@@ -345,7 +265,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		//Reset Player Config
 		$scope.me.lives = 3;
 		$scope.me.won = 0;
-		$scope.me.bet = 0;
+		$scope.me.bet = '-';
 		$scope.me.card = '';
 
 		if(playerToPlay == $scope.me.name){
@@ -357,6 +277,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	});
 
 	socket.on('bet-update', function(bet, playerWhoBet, nextPlayer, startPlayPhase){
+		//Updates bet locally
 		for (let i in $scope.players){
 			if($scope.players[i].name == playerWhoBet){
 				$scope.players[i].bet = bet;
@@ -364,13 +285,47 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			}
 		}
 
-		if($scope.me.name == nextPlayer){
+		//Set turn
+		if ($scope.me.name == nextPlayer) {
 			$scope.myTurn = true;
-		}
-		else{
+
+			//Check if it's last player
+			let isLast = true;
+			for (let i in $scope.players) {
+				if ($scope.players[i].name != $scope.me.name && $scope.players[i].bet == '-') {
+					isLast = false;
+					break;
+				}
+			}
+
+			console.log(isLast);
+
+			//Check which bet is blocked
+			if (isLast) {
+				let betSum = 0;
+				for (let i in $scope.players) {
+					if ($scope.players[i].name != $scope.me.name) {
+						betSum += $scope.players[i].bet;
+					}
+				}
+
+				console.log ("Betsum : " + betSum);
+
+				let cantBet = $scope.matchNumber - betSum;
+
+				$scope.betOptions = $scope.betOptions.filter(function(iBet) {
+					if  (iBet != cantBet) {
+						return true;
+					} else {
+						return false;
+					}
+				});
+			}
+		} else {
 			$scope.myTurn = false;
 		}
 
+		//Change phase to play
 		if(startPlayPhase){
 			$scope.phase = "play";
 		}

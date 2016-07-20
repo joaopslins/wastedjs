@@ -7,10 +7,10 @@ var Player = function (name) {
     this.ready = false;
     this.lives = Player.prototype.LIVES;
     this.won = 0;
-    this.bet = 0;
+    this.bet = '-';
 
     this.hand = new Deck();
-}
+};
 
 Player.prototype.LIVES = 3;
 

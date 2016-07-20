@@ -13,14 +13,14 @@ var Game = function(players) {
     this.matchNumber = 2;
     this.phase = "bet";
 
-    this.playersQty - players.length;
+    this.playersQty = players.length;
 
     this.startMatch(this.matchNumber);
-}
+};
 
 Game.prototype.startMatch = function(matchNumber){
     //Reset Players
-    for(i in this.players){
+    for(var i in this.players){
         var player = this.players[i];
 
         player.won = 0;

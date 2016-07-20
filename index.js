@@ -37,7 +37,7 @@ var convertPlayer = function(player)
     };
 
     return clientPlayer;
-}
+};
 
 var createClientPlayerList = function()
 {
@@ -52,7 +52,7 @@ var createClientPlayerList = function()
 };
 
 var isNameAvailable = function(name){
-    for(i in players)
+    for(var i in players)
     {
         if(players[i].name == name)
         {
@@ -74,12 +74,12 @@ var disconnect_C = function(socket){
     });
 
     //Undo game
-    if(game != null){
+    if(game !== null){
         game = null;
 
         //Reset players
         for(var i in players){
-            var player = players[i]
+            var player = players[i];
 
             player.ready = false;
             player.lives = 3;
@@ -90,7 +90,7 @@ var disconnect_C = function(socket){
 
     //Update removed player to other clients
     socket.broadcast.emit('player-disconnect', name);
-}
+};
 
 //Server connection code
 io.on('connection', function (socket)
@@ -134,7 +134,7 @@ io.on('connection', function (socket)
 	socket.on('ready', function(client)
 	{
 		//Update player in server player list
-		for(i in players)
+		for(var i in players)
 		{
 			if (players[i].name == client.name)
 			{
@@ -146,6 +146,7 @@ io.on('connection', function (socket)
 		}
 	});
 
+    //Player has done a bet
     socket.on('player-bet', function(bet){
         game.playerBet(socket.name, bet);
         var startPlayPhase = game.phase == "play";
