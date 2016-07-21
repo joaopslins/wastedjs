@@ -86,4 +86,15 @@ Deck.prototype.distribute = function(players, qty) {
     }
 };
 
+Deck.prototype.getCard = function (card) {
+    for (var i in this.cards) {
+        if (this.cards[i].toString() == card) {
+            return this.cards[i];
+        }
+    }
+    
+    //Fail
+    return null;
+};
+
 module.exports = Deck;

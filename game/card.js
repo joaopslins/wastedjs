@@ -6,7 +6,7 @@ var Card = function(rank, suit) {
 }
 
 Card.prototype.value = function() {
-           if(this.rank == 0 && this.suit == 2) { /* 4   of Clubs */
+    if(this.rank == 0 && this.suit == 2) { /* 4   of Clubs */
         return 13;
     } else if(this.rank == 3 && this.suit == 1) { /* 7   of Hearts */
         return 12;

@@ -33,19 +33,19 @@ var convertPlayer = function(player)
         lives: player.lives,
         won: player.won,
         bet: player.bet,
-        card: ""
+        card: ''
     };
 
     return clientPlayer;
 };
 
-var createClientPlayerList = function()
+var createClientPlayerList = function(playerL)
 {
     var clientPlayerList = [];
 
-    for(var i = 0; i < players.length; i++)
+    for(var i = 0; i < playerL.length; i++)
     {
-        clientPlayerList.push(convertPlayer(players[i]));
+        clientPlayerList.push(convertPlayer(playerL[i]));
     }
 
     return clientPlayerList;
@@ -111,7 +111,7 @@ io.on('connection', function (socket)
 
         //Return playerlist and success to requested player
         callback({
-            "playerList" : createClientPlayerList(),
+            "playerList" : createClientPlayerList(players),
             "success" : success
         });
 
@@ -154,7 +154,28 @@ io.on('connection', function (socket)
         io.emit('bet-update', bet, socket.name, game.roundPlayer, startPlayPhase);
     });
 
-    //Host started game
+    //Player played a card
+    socket.on('player-play-card', function(card) {
+        game.playerPlayCard(socket.name, card);
+
+        //End round
+        if (game.phase == 'end') {
+            io.emit('play-update', card, socket.name, game.roundPlayer, true);
+            game.roundEnd();
+
+            if (game.phase = "endmatch") {
+                //End match
+            } else {
+                setTimeout(function(){
+                    io.emit('new-round', createClientPlayerList(game.players), game.roundPlayer);
+                }, 1000);
+            }
+        } else if (game.phase == 'play') {
+            io.emit('play-update', card, socket.name, game.roundPlayer, false);
+        }
+    });
+
+    //Host client started game
     socket.on('start-game', function(){
         game = new Game (players);
         io.emit('match-start-notification', game.startMatchPlayer);

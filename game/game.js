@@ -1,5 +1,6 @@
 'use strict';
 var Deck = require ("./deck");
+var Card = require ("./card");
 
 //Executes when a game starts
 var Game = function(players) {
@@ -15,6 +16,10 @@ var Game = function(players) {
 
     this.playersQty = players.length;
 
+    this.winCard = null;
+    this.winPlayer = '';
+    this.isTied = false;
+
     this.startMatch(this.matchNumber);
 };
 
@@ -24,7 +29,7 @@ Game.prototype.startMatch = function(matchNumber){
         var player = this.players[i];
 
         player.won = 0;
-        player.bet = 0;
+        player.bet = '-';
     }
 
     //Distribute cards
@@ -61,17 +66,73 @@ Game.prototype.setNextPlayer = function(){
     }
 
     this.roundPlayer = this.players[index].name;
-}
+};
 
 Game.prototype.playerBet = function(name, bet){
     this.players[this.getPlayerIndex(name)].bet = bet;
 
     this.setNextPlayer();
 
+    //End bet phase
     if(this.roundPlayer == this.startRoundPlayer){
         this.phase = "play";
+        this.roundNumber = this.matchNumber;
+
+        this.winCard = null;
+        this.winPlayer = '';
+        this.isTied = false;
+    }
+};
+
+Game.prototype.playerPlayCard = function (name, card) {
+    var cards = this.players[this.getPlayerIndex(name)].hand;
+    var card = cards.getCard (card);
+
+    //Updates winner card when someone plays
+    if (this.winCard == null) {
+        this.winPlayer = name;
+        this.winCard = card;
+        this.isTied = false;
+    } else {
+        if (card.value() > this.winCard.value()) {
+            this.winCard = card;
+            this.winPlayer = name;
+            this.isTied = false;
+        } else if (card.value() == this.winCard.value()) {
+            this.winPlayer = name;
+            this.isTied = true;
+        }
     }
 
+    //Remove card played
+    this.players[this.getPlayerIndex(name)].hand.remove(card.toString());
+
+    this.setNextPlayer();
+
+    //End round
+    if (this.roundPlayer == this.startRoundPlayer) {
+        this.phase = "end";
+    }
 };
+
+Game.prototype.roundEnd = function() {
+    this.roundNumber--;
+
+    if (this.roundNumber > 0) {
+        //Set win
+        for (var i in this.players) {
+            if (this.players[i].name == this.winPlayer && !this.isTied) {
+                this.players[i].won++;
+            }
+        }
+
+        //Set next round players
+        this.startRoundPlayer = this.winPlayer;
+        this.roundPlayer = this.winPlayer;
+    } else {
+        this.phase = "endmatch";
+    }
+
+}
 
 module.exports = Game;

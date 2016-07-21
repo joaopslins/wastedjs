@@ -157,10 +157,21 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	//Play card button function
 	$scope.playCard = function()
 	{
-		if($scope.myTurn){
+		if($scope.myTurn && $scope.phase == 'play' && $scope.me.card != ''){
+			socket.emit('player-play-card', $scope.me.card);
 
+			//Remove played card
+			$scope.cards = $scope.cards.filter(function (c) {
+				if (c == $scope.me.card) {
+					return false;
+				} else {
+					return true;
+				}
+			});
+
+			$scope.myTurn = false;
+			$scope.me.card = '';
 		}
-		//TODO play card function
 	}
 
 	$scope.betClick = function(index){
@@ -180,7 +191,9 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	//Select card function
 	$scope.cardSelect = function (index)
 	{
-		$scope.me.card = $scope.cards[index];
+		if ($scope.myTurn) {
+			$scope.me.card = $scope.cards[index];
+		}
 	}
 
 	//Start game - Only for host player
@@ -298,8 +311,6 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 				}
 			}
 
-			console.log(isLast);
-
 			//Check which bet is blocked
 			if (isLast) {
 				let betSum = 0;
@@ -308,8 +319,6 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 						betSum += $scope.players[i].bet;
 					}
 				}
-
-				console.log ("Betsum : " + betSum);
 
 				let cantBet = $scope.matchNumber - betSum;
 
@@ -328,6 +337,39 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		//Change phase to play
 		if(startPlayPhase){
 			$scope.phase = "play";
+		}
+	});
+
+	socket.on('play-update', function (card, playerWhoPlayed, nextPlayer, end) {
+		//Update Card locally
+		for (let i in $scope.players) {
+			if ($scope.players[i].name == playerWhoPlayed) {
+				$scope.players[i].card = card;
+				break;
+			}
+		}
+
+		if (!end) {
+			//Set next turn
+			if ($scope.me.name == nextPlayer) {
+				$scope.myTurn = true;
+			} else {
+				$scope.myTurn = false;
+			}
+		}
+	});
+
+	socket.on('new-round', function (players, playerToPlay){
+		//Updating player list
+		for (let i in $scope.players) {
+			$scope.players[i].won = players[i].won;
+			$scope.players[i].card = '';
+		}
+
+		if ($scope.me.name == playerToPlay) {
+			$scope.myTurn = true;
+		} else {
+			$scope.myTurn = false;
 		}
 	});
 });
