@@ -24,6 +24,7 @@ server.listen(app.get('port'), function () {
 //Server Variables
 var players = [];
 var game = null;
+var callInterval = 1500; //in ms
 
 var convertPlayer = function(player)
 {
@@ -33,6 +34,7 @@ var convertPlayer = function(player)
         lives: player.lives,
         won: player.won,
         bet: player.bet,
+        isAlive: player.isAlive,
         card: ''
     };
 
@@ -158,27 +160,45 @@ io.on('connection', function (socket)
     socket.on('player-play-card', function(card) {
         game.playerPlayCard(socket.name, card);
 
-        //End round
         if (game.phase == 'end') {
-            io.emit('play-update', card, socket.name, game.roundPlayer, true);
+            //Round is over
+            io.emit('play-update', card, socket.name, '');
             game.roundEnd();
 
-            if (game.phase = "endmatch") {
-                //End match
+            if (game.phase == "endmatch") {
+                setTimeout(function(){
+                    io.emit('new-round', createClientPlayerList(game.players), '');
+
+                    //Match is over
+                    game.matchEnd();
+
+                    if (game.phase == "endgame") {
+                        setTimeout(function(){
+                            io.emit('end-game', createClientPlayerList(game.players));
+                        }, callInterval);
+                    } else if (game.phase == "bet"){
+                        setTimeout(function(){
+                            io.emit('new-match', createClientPlayerList(game.players), game.startMatchPlayer);
+                        }, callInterval);
+                    }
+                }, callInterval);
+
             } else {
+                //Match is not over
                 setTimeout(function(){
                     io.emit('new-round', createClientPlayerList(game.players), game.roundPlayer);
-                }, 1000);
+                }, callInterval);
             }
         } else if (game.phase == 'play') {
-            io.emit('play-update', card, socket.name, game.roundPlayer, false);
+            //Continue playing the same round
+            io.emit('play-update', card, socket.name, game.roundPlayer);
         }
     });
 
     //Host client started game
     socket.on('start-game', function(){
         game = new Game (players);
-        io.emit('match-start-notification', game.startMatchPlayer);
+        io.emit('game-start-notification', game.startMatchPlayer);
     });
 
     //Client requested his cards

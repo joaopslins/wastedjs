@@ -215,20 +215,18 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 
 	socket.on('player-disconnect', function(dcName)
 	{
-		$scope.players = $scope.players.filter(function(player)
-		{
+		$scope.players = $scope.players.filter(function(player) {
 			return player.name != dcName;
 		});
 
-		if($scope.players[0].name == $scope.me.name)
-		{
+		if ($scope.players[0].name == $scope.me.name) {
 			$scope.firstPlayer = true;
 		}
 
 		$scope.readyToStart = false;
 
 		//If ongoing game
-		if($scope.game){
+		if ($scope.game) {
 			$scope.game = false;
 			$scope.me.ready = false;
 		}
@@ -261,30 +259,34 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		$scope.readyToStart = aux;
 	});
 
-	socket.on('match-start-notification', function(playerToPlay){
+	socket.on('game-start-notification', function(playerToPlay){
 		socket.emit('request-cards', null, function(data){
 			$scope.cards = data.cards;
 			$scope.matchNumber = $scope.cards.length;
 
+			$scope.betOptions.length = 0;
 			for(var i = 0; i < $scope.matchNumber; i++){
 				$scope.betOptions.push(i);
 			}
 			$scope.betOptions.push($scope.matchNumber);
 		});
 
+		//Set flags
 		$scope.game = true;
 		$scope.phase = "bet";
 
-		//Reset Player Config
-		$scope.me.lives = 3;
-		$scope.me.won = 0;
-		$scope.me.bet = '-';
-		$scope.me.card = '';
-
-		if(playerToPlay == $scope.me.name){
-			$scope.myTurn = true;
+		//Reset Players Config
+		for (let i in $scope.players){
+			$scope.players[i].lives = 3;
+			$scope.players[i].won = 0;
+			$scope.players[i].bet = '-';
+			$scope.players[i].card = '';
 		}
-		else{
+
+		//Set turn
+		if (playerToPlay == $scope.me.name) {
+			$scope.myTurn = true;
+		} else {
 			$scope.myTurn = false;
 		}
 	});
@@ -335,12 +337,12 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		}
 
 		//Change phase to play
-		if(startPlayPhase){
+		if (startPlayPhase) {
 			$scope.phase = "play";
 		}
 	});
 
-	socket.on('play-update', function (card, playerWhoPlayed, nextPlayer, end) {
+	socket.on('play-update', function (card, playerWhoPlayed, nextPlayer) {
 		//Update Card locally
 		for (let i in $scope.players) {
 			if ($scope.players[i].name == playerWhoPlayed) {
@@ -349,13 +351,11 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			}
 		}
 
-		if (!end) {
-			//Set next turn
-			if ($scope.me.name == nextPlayer) {
-				$scope.myTurn = true;
-			} else {
-				$scope.myTurn = false;
-			}
+		//Set next turn
+		if ($scope.me.name == nextPlayer) {
+			$scope.myTurn = true;
+		} else {
+			$scope.myTurn = false;
 		}
 	});
 
@@ -366,10 +366,60 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			$scope.players[i].card = '';
 		}
 
+		//Set next turn
 		if ($scope.me.name == playerToPlay) {
 			$scope.myTurn = true;
 		} else {
 			$scope.myTurn = false;
 		}
+	});
+
+	socket.on('new-match', function (players, playerToPlay) {
+		//Updating player list
+		for (let i in $scope.players) {
+			$scope.players[i].lives = players[i].lives;
+			$scope.players[i].won = 0;
+			$scope.players[i].card = '';
+			$scope.players[i].bet = '-';
+		}
+
+		//Updating cards
+		socket.emit('request-cards', null, function(data){
+			$scope.cards = data.cards;
+			$scope.matchNumber = $scope.cards.length;
+
+			$scope.betOptions.length = 0;
+			for(var i = 0; i < $scope.matchNumber; i++){
+				$scope.betOptions.push(i);
+			}
+			$scope.betOptions.push($scope.matchNumber);
+		});
+
+		//Update phase and playerturn
+		$scope.phase = "bet";
+
+		if ($scope.me.name == playerToPlay) {
+			$scope.myTurn = true;
+		} else {
+			$scope.myTurn = false;
+		}
+	});
+
+	socket.on('end-game', function (players) {
+		//TODO better end game
+
+		//Updating player list
+		for (let i in $scope.players) {
+			$scope.players[i].lives = players[i].lives;
+			$scope.players[i].won = 0;
+			$scope.players[i].card = '';
+			$scope.players[i].bet = '-';
+			$scope.players[i].ready = false;
+		}
+
+		//Ending game
+		$scope.game = false;
+		$scope.phase = false;
+		$scope.readyToStart = false;
 	});
 });
