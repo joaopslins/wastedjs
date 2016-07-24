@@ -211,4 +211,8 @@ io.on('connection', function (socket)
 	socket.on('disconnect', function(){
         disconnect_C(socket);
     });
+
+    socket.on('connect_timeout', function(){
+        console.log("connect_timeout");
+    });
 });
