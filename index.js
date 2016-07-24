@@ -103,6 +103,17 @@ io.on('connection', function (socket)
     if (socket.name == null) {
         console.log("undefined connected!");
         socket.emit('reset');
+    } else {
+        var isLogged = false;
+        for (var i in players) {
+            if (players[i].name == socket.name) {
+                isLogged = true;
+            }
+        }
+        if (!isLogged) {
+            console.log("ghost player '" + socket.name + "' detected!");
+            socket.emit('reset');
+        }
     }
 
 	socket.on('login', function (name, callback)

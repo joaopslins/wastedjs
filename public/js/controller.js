@@ -304,7 +304,8 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			//Check if it's last player
 			let isLast = true;
 			for (let i in $scope.players) {
-				if ($scope.players[i].name != $scope.me.name && $scope.players[i].bet == '-') {
+				//If there is a player who didn't bet and is alive, is not last
+				if ($scope.players[i].name != $scope.me.name && $scope.players[i].bet == '-' && $scope.players[i].lives > 0) {
 					isLast = false;
 					break;
 				}
