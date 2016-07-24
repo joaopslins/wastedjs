@@ -90,6 +90,9 @@ var disconnect_C = function(socket){
         }
     }
 
+    //Reset socket name
+    socket.name = null;
+
     //Update removed player to other clients
     socket.broadcast.emit('player-disconnect', name);
 };
@@ -97,7 +100,10 @@ var disconnect_C = function(socket){
 //Server connection code
 io.on('connection', function (socket)
 {
-    console.log("entrou");
+    if (socket.name == null) {
+        console.log("undefined connected!");
+        socket.emit('reset');
+    }
 
 	socket.on('login', function (name, callback)
 	{
@@ -167,6 +173,7 @@ io.on('connection', function (socket)
         game.playerPlayCard(socket.name, card);
 
         if (game.phase == 'end') {
+            console.log("round over");
             //Round is over
             io.emit('play-update', card, socket.name, '');
             game.roundEnd();
@@ -176,9 +183,11 @@ io.on('connection', function (socket)
                     io.emit('new-round', createClientPlayerList(game.players), '');
 
                     //Match is over
+                    console.log("match over");
                     game.matchEnd();
 
                     if (game.phase == "endgame") {
+                        console.log("game over");
                         setTimeout(function(){
                             io.emit('end-game', createClientPlayerList(game.players));
                         }, callInterval);

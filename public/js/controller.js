@@ -19,13 +19,10 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	};
 
 	// Local player list
-	$scope.players = [
-	];
+	$scope.players = [];
 
 	// Local player card list
-	$scope.cards = [
-		"4S","5H","6C", "7D", "4H", "5C", "6D", "7S"
-	];
+	$scope.cards = [];
 
 	//Bet options
 	$scope.betOptions = [];
@@ -421,5 +418,34 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		$scope.game = false;
 		$scope.phase = false;
 		$scope.readyToStart = false;
+	});
+
+	socket.on('reset', function() {
+		$scope.loginErrorMessage = "";
+		$scope.readyToStart = false;
+		$scope.firstPlayer = false;
+		$scope.loginError = false;
+		$scope.loggedIn = 'no';
+		$scope.game = false;
+		$scope.myTurn = false;
+		$scope.phase = false;
+
+		$scope.me = {
+			name : "",
+			ready : false,
+			lives : 3,
+			won : 0,
+			bet : '-',
+			card : ''
+		};
+
+		// Local player list
+		$scope.players = [];
+
+		// Local player card list
+		$scope.cards = [];
+
+		//Bet options
+		$scope.betOptions = [];
 	});
 });
