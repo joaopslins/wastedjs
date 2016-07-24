@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require ('socket.io') (server);
+var io = require ('socket.io') (server, {"pingInterval" : 10000});
 
 // External Files
 var Card = require ('./game/card');
@@ -24,7 +24,7 @@ server.listen(app.get('port'), function () {
 //Server Variables
 var players = [];
 var game = null;
-var callInterval = 1500; //in ms
+var callInterval = 3000; //in ms
 
 var convertPlayer = function(player)
 {
@@ -101,6 +101,8 @@ io.on('connection', function (socket)
 
 	socket.on('login', function (name, callback)
 	{
+        console.log(name + " login");
+
         var success = 0;
         //If name not available
         if(!isNameAvailable(name)){
@@ -129,12 +131,14 @@ io.on('connection', function (socket)
 	});
 
     socket.on('logout', function(){
+        console.log(socket.name + " logout");
         disconnect_C(socket);
     });
 
     // Client = {name,ready}
 	socket.on('ready', function(client)
 	{
+        console.log(client.name + " ready is " + client.ready);
 		//Update player in server player list
 		for(var i in players)
 		{
@@ -150,6 +154,7 @@ io.on('connection', function (socket)
 
     //Player has done a bet
     socket.on('player-bet', function(bet){
+        console.log(socket.name + " betted " + bet);
         game.playerBet(socket.name, bet);
         var startPlayPhase = game.phase == "play";
 
@@ -158,6 +163,7 @@ io.on('connection', function (socket)
 
     //Player played a card
     socket.on('player-play-card', function(card) {
+        console.log(socket.name + " player card " + card);
         game.playerPlayCard(socket.name, card);
 
         if (game.phase == 'end') {
@@ -197,22 +203,21 @@ io.on('connection', function (socket)
 
     //Host client started game
     socket.on('start-game', function(){
+        console.log("game started!");
         game = new Game (players);
         io.emit('game-start-notification', game.startMatchPlayer);
     });
 
     //Client requested his cards
     socket.on('request-cards', function(data, callback){
+        console.log(socket.name + " asked his cards");
         callback({
             'cards' : game.getCardsFromPlayer(socket.name)
         });
     });
 
 	socket.on('disconnect', function(){
+        console.log(socket.name + " disconnected");
         disconnect_C(socket);
-    });
-
-    socket.on('connect_timeout', function(){
-        console.log("connect_timeout");
     });
 });

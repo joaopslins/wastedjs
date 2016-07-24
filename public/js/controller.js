@@ -422,8 +422,4 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		$scope.phase = false;
 		$scope.readyToStart = false;
 	});
-
-    socket.on('connect_timeout', function(){
-        console.log("connect_timeout");
-    });
 });
