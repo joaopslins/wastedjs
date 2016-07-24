@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require ('socket.io') (server, {"pingInterval" : 10000});
+var io = require ('socket.io') (server);
 
 // External Files
 var Card = require ('./game/card');

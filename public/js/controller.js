@@ -314,7 +314,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			if (isLast) {
 				let betSum = 0;
 				for (let i in $scope.players) {
-					if ($scope.players[i].name != $scope.me.name) {
+					if ($scope.players[i].name != $scope.me.name && $scope.players[i].lives > 0) {
 						betSum += $scope.players[i].bet;
 					}
 				}
