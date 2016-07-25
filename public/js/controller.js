@@ -263,6 +263,11 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	});
 
 	socket.on('game-start-notification', function(playerToPlay){
+		//If player is not in game, don't check
+		if (!$scope.game) {
+			return;
+		}
+		
 		socket.emit('request-cards', null, function(data){
 			$scope.cards = data.cards;
 			$scope.matchNumber = $scope.cards.length;
