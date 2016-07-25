@@ -379,6 +379,11 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	});
 
 	socket.on('new-match', function (players, playerToPlay) {
+		//If player is not in game, don't check
+		if (!$scope.game) {
+			return;
+		}
+
 		//Updating player list
 		for (let i in $scope.players) {
 			$scope.players[i].lives = players[i].lives;
