@@ -69,6 +69,11 @@ var disconnect_C = function(socket){
     //Set name as socket name
 	var name = socket.name;
 
+    //If undefined, dont close game;
+    if (name == null) {
+        return;
+    }
+
     //Remove player from server playlist
     players = players.filter(function (player)
     {
