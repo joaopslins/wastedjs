@@ -65,6 +65,7 @@ Game.prototype.getCardsFromPlayer = function(playerName){
 
 Game.prototype.setNextPlayer = function(isNextMatch){
     var found = false;
+    var startIndex = null;
 
     while (!found) {
         if (isNextMatch) {
@@ -72,6 +73,12 @@ Game.prototype.setNextPlayer = function(isNextMatch){
         } else {
             var index = this.getPlayerIndex(this.roundPlayer);
         }
+
+        //Get first index
+        if (startIndex == null) {
+            startIndex = index;
+        }
+
         index++;
 
         if (index == this.players.length) {
@@ -86,6 +93,11 @@ Game.prototype.setNextPlayer = function(isNextMatch){
 
         //Only pick a player if he's alive
         if (this.players[index].isAlive) {
+            found = true;
+        }
+
+        //If no one is alive, end game
+        if (index == startIndex) {
             found = true;
         }
     }

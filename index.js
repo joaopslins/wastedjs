@@ -24,7 +24,7 @@ server.listen(app.get('port'), function () {
 //Server Variables
 var players = [];
 var game = null;
-var callInterval = 1500; //in ms
+var callInterval = 3000; //in ms
 
 var convertPlayer = function(player)
 {
@@ -90,6 +90,9 @@ var disconnect_C = function(socket){
         }
     }
 
+    //Reset socket name
+    socket.name = null;
+
     //Update removed player to other clients
     socket.broadcast.emit('player-disconnect', name);
 };
@@ -97,10 +100,26 @@ var disconnect_C = function(socket){
 //Server connection code
 io.on('connection', function (socket)
 {
-    console.log("entrou");
+    if (socket.name == null) {
+        console.log("undefined connected!");
+        socket.emit('reset');
+    } else {
+        var isLogged = false;
+        for (var i in players) {
+            if (players[i].name == socket.name) {
+                isLogged = true;
+            }
+        }
+        if (!isLogged) {
+            console.log("ghost player '" + socket.name + "' detected!");
+            socket.emit('reset');
+        }
+    }
 
 	socket.on('login', function (name, callback)
 	{
+        console.log(name + " login");
+
         var success = 0;
         //If name not available
         if(!isNameAvailable(name)){
@@ -109,6 +128,10 @@ io.on('connection', function (socket)
         //If game is full
         else if(players.length == 5){
             success = 2;
+        }
+        //If game is on
+        else if (game != null) {
+            success = 3;
         }
 
         //Return playerlist and success to requested player
@@ -129,12 +152,14 @@ io.on('connection', function (socket)
 	});
 
     socket.on('logout', function(){
+        console.log(socket.name + " logout");
         disconnect_C(socket);
     });
 
     // Client = {name,ready}
 	socket.on('ready', function(client)
 	{
+        console.log(client.name + " ready is " + client.ready);
 		//Update player in server player list
 		for(var i in players)
 		{
@@ -150,6 +175,7 @@ io.on('connection', function (socket)
 
     //Player has done a bet
     socket.on('player-bet', function(bet){
+        console.log(socket.name + " betted " + bet);
         game.playerBet(socket.name, bet);
         var startPlayPhase = game.phase == "play";
 
@@ -158,9 +184,11 @@ io.on('connection', function (socket)
 
     //Player played a card
     socket.on('player-play-card', function(card) {
+        console.log(socket.name + " player card " + card);
         game.playerPlayCard(socket.name, card);
 
         if (game.phase == 'end') {
+            console.log("round over");
             //Round is over
             io.emit('play-update', card, socket.name, '');
             game.roundEnd();
@@ -170,9 +198,11 @@ io.on('connection', function (socket)
                     io.emit('new-round', createClientPlayerList(game.players), '');
 
                     //Match is over
+                    console.log("match over");
                     game.matchEnd();
 
                     if (game.phase == "endgame") {
+                        console.log("game over");
                         setTimeout(function(){
                             io.emit('end-game', createClientPlayerList(game.players));
                         }, callInterval);
@@ -197,18 +227,21 @@ io.on('connection', function (socket)
 
     //Host client started game
     socket.on('start-game', function(){
+        console.log("game started!");
         game = new Game (players);
         io.emit('game-start-notification', game.startMatchPlayer);
     });
 
     //Client requested his cards
     socket.on('request-cards', function(data, callback){
+        console.log(socket.name + " asked his cards");
         callback({
             'cards' : game.getCardsFromPlayer(socket.name)
         });
     });
 
 	socket.on('disconnect', function(){
+        console.log(socket.name + " disconnected");
         disconnect_C(socket);
     });
 });

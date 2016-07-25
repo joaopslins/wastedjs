@@ -19,13 +19,10 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	};
 
 	// Local player list
-	$scope.players = [
-	];
+	$scope.players = [];
 
 	// Local player card list
-	$scope.cards = [
-		"4S","5H","6C", "7D", "4H", "5C", "6D", "7S"
-	];
+	$scope.cards = [];
 
 	//Bet options
 	$scope.betOptions = [];
@@ -75,6 +72,12 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 						{
 							$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
 														'<br />Room is full!'
+						}
+						//In game
+						else if(data.success == 3)
+						{
+							$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+														'<br />Room in game!'
 						}
 
 						$scope.loggedIn = "no";
@@ -307,7 +310,8 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			//Check if it's last player
 			let isLast = true;
 			for (let i in $scope.players) {
-				if ($scope.players[i].name != $scope.me.name && $scope.players[i].bet == '-') {
+				//If there is a player who didn't bet and is alive, is not last
+				if ($scope.players[i].name != $scope.me.name && $scope.players[i].bet == '-' && $scope.players[i].lives > 0) {
 					isLast = false;
 					break;
 				}
@@ -317,7 +321,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			if (isLast) {
 				let betSum = 0;
 				for (let i in $scope.players) {
-					if ($scope.players[i].name != $scope.me.name) {
+					if ($scope.players[i].name != $scope.me.name && $scope.players[i].lives > 0) {
 						betSum += $scope.players[i].bet;
 					}
 				}
@@ -421,5 +425,34 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		$scope.game = false;
 		$scope.phase = false;
 		$scope.readyToStart = false;
+	});
+
+	socket.on('reset', function() {
+		$scope.loginErrorMessage = "";
+		$scope.readyToStart = false;
+		$scope.firstPlayer = false;
+		$scope.loginError = false;
+		$scope.loggedIn = 'no';
+		$scope.game = false;
+		$scope.myTurn = false;
+		$scope.phase = false;
+
+		$scope.me = {
+			name : "",
+			ready : false,
+			lives : 3,
+			won : 0,
+			bet : '-',
+			card : ''
+		};
+
+		// Local player list
+		$scope.players = [];
+
+		// Local player card list
+		$scope.cards = [];
+
+		//Bet options
+		$scope.betOptions = [];
 	});
 });
