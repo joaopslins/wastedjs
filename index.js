@@ -129,6 +129,10 @@ io.on('connection', function (socket)
         else if(players.length == 5){
             success = 2;
         }
+        //If game is on
+        else if (game != null) {
+            success = 3;
+        }
 
         //Return playerlist and success to requested player
         callback({

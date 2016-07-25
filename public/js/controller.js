@@ -73,6 +73,12 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 							$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
 														'<br />Room is full!'
 						}
+						//In game
+						else if(data.success == 3)
+						{
+							$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+														'<br />Room in game!'
+						}
 
 						$scope.loggedIn = "no";
 						$scope.loginError = true;
