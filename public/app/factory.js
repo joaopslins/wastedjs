@@ -1,8 +1,22 @@
 // From http://briantford.com/blog/angular-socket-io
 wastedJS.factory("socket", function ($rootScope) {
-	var socket = io.connect();
+	var socket = null;
 
 	return {
+		connect: function() {
+			socket = io.connect();
+		},
+		disconnect: function() {
+			socket.disconnect();
+			socket = null;
+		},
+		isConnected: function() {
+			if (socket) {
+				return true;
+			} else {
+				return false;
+			}
+		},
 		on: function (eventName, callback) {
 			socket.on(eventName, function () {
 				var args = arguments;

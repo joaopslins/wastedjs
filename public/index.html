@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="wastedJSapp">
 	<head>
+		<base href="/">
 
 		<!-- Socket IO -->
 		<script src="/socket.io/socket.io.js"></script>
@@ -8,6 +9,7 @@
 		<!-- Angular -->
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-route.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-sanitize.js"></script>
 
  		<!-- jQuery -->
@@ -19,17 +21,18 @@
 
 		<!-- Source -->
 		<link href="css/main.css" rel="stylesheet">
-		<script src="js/app.js"></script>
-		<script src="js/factory.js"></script>
-		<script src="js/filter.js"></script>
-		<script src="js/controller.js"></script>
+		<script src="app/app.js"></script>
+		<script src="app/factory.js"></script>
+		<script src="app/filter.js"></script>
+		<script src="app/Login/loginController.js"></script>
+		<script src="app/Game/gameController.js"></script>
+		<script src="app/config.js"></script>
 
 		<title>WastedJS</title>
 
 	</head>
 
-	<body ng-controller="wastedJSctrl">
-
+	<body>
 		<!-- Navigation Bar -->
 		<nav class="navbar navbar-inverse">
 			<div class="container-fluid">
@@ -40,165 +43,10 @@
 		</nav>
 
 		<!-- Main Container -->
-		<div class="container"  >
+		<div class="container">
 			<div class="row">
-				<div class="col-md-12 panel panel-default" style = "padding-top: 15px">
-
-					<!-- Row = Login and Game -->
-					<div class="row">
-
-						<div class="col-md-3 col-xs-4">
-							<!-- Login Panel -->
-							<div class="panel panel-default fjs-login-panel">
-								<div class="panel-heading" style = "text-align:center">
-									<h3 class="panel-title"><b>Login</b></h3>
-								</div>
-
-
-								<div class="panel-body">
-
-									<!-- Not logged in -->
-									<div ng-show="loggedIn == 'no'" class="login-animate">
-										<div class="row">
-											<div class="col-xs-3">
-												<h4>Nick:</h4>
-											</div>
-											<div class="col-xs-9">
-												<input class="form-control" ng-model="me.name" type="text">
-											</div>
-										</div>
-										<br />
-										<button type="button" class="btn btn-lg btn-default center-block" ng-click="loginToggle()">
-											Login
-										</button>
-									</div>
-
-									<!-- Logged in -->
-									<div ng-show="loggedIn == 'yes'" class="login-animate">
-										<div style = "text-align:center">
-											<h4>You are logged in, {{ me.name }}</h4>
-										</div>
-										<br />
-										<button type="button" class="btn btn-lg btn-danger center-block" ng-click="loginToggle()">
-											Logout
-										</button>
-									</div>
-
-								</div>
-							</div>
-
-							<!-- Login Alert Box -->
-							<div class="alert alert-danger" style="text-align:center" ng-show="loginError" ng-bind-html="loginErrorMessage">
-							</div>
-
-							<!-- Player Panel -->
-							<div class="panel panel-default login-animate" ng-show="loggedIn == 'yes'">
-
-							  	<div class="panel-heading"  style = "text-align:center">
-					    			<h3 class="panel-title"><b>Players</b></h3>
-							  	</div>
-
-								<!-- Player List -->
-							  	<div class="panel-body"  style = "text-align:center">
-									<div ng-repeat="player in players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
-										{{player.name}}
-									</div>
-							  	</div>
-
-								<!-- Ready Button -->
-							  	<div class="panel-footer">
-									<button type="button" class="btn btn-danger center-block"
-										ng-click="readyToggle()"
-										ng-show="!game">
-										Ready
-									</button>
-									<br />
-									<button type="button" class="btn login-animate start-disabled center-block"
-										ng-class="{'start-button' : readyToStart}"
-										ng-show="firstPlayer && !game"
-										ng-click="startGame()">
-										Start Game
-									</button>
-							  	</div>
-							</div>
-						</div>
-
-						<!-- Game Panel -->
-						<div class="col-md-9 col-xs-8">
-							<div class="panel panel-default">
-								<div class="panel-heading" style = "text-align:center">
-									<h3 class="panel-title"><b>Game</b></h3>
-								</div>
-
-								<div class="panel-body">
-
-									<!-- Player Scoreboard -->
-									<div class="panel panel-default fjs-game-main">
-										<table class="table table-bordered fjs-game-table">
-											<tr class="table-header">
-												<td> Nick </td>
-												<td> Lives </td>
-												<td> Won/Bet </td>
-											</tr>
-											<tr ng-repeat="player in players">
-												<td>{{player.name}}</td>
-												<td>{{player.lives}}</td>
-												<td>{{player.won}} / {{player.bet}}</td>
-											</tr>
-										</table>
-									</div>
-
-									<!-- Played cards -->
-									<div class="panel panel-default">
-										<table class ="table table-bordered fjs-player-cards">
-											<tr class="table-header">
-												<td ng-repeat= "player in players" >{{player.name}}</td>
-											</tr>
-											<tr>
- 												<td
-													class = "fjs-card"
-													ng-repeat = "player in players"
-													ng-bind-html = "player.card | cardFilter"
-													ng-class="cardIsRed(player.card) ? 'red-card' : '' ">
-												</td>
-											</tr>
-										</table>
-									</div>
-
-									<div class="well" ng-show="phase == 'bet' && myTurn" style="text-align:center">
-										<h4> Bet! </h4>
-										<button type="button" class="btn btn-primary"
-												ng-repeat="bet in betOptions"
-												ng-click="betClick($index)">
-											{{bet}}
-										</button>
-									</div>
-
-									<!-- Player hand section -->
-									<div class="well well-lg" style="text-align:center" >
-										<div class="row">
-											<div
-												class = "fjs-card fjs-hand"
-												ng-repeat="card in cards"
-												ng-bind-html = "card | cardFilter"
-												ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == me.card}"
-												ng-click = "cardSelect($index)" >
-											</div>
-										</div>
-										<div class="row">
-											<button type="button" class="btn center-block"
-												ng-click="playCard()"
-												ng-class="{'play-active': (myTurn && phase == 'play'), 'play-disabled':!(myTurn && phase == 'play')}">
-												Play
-											</button>
-										</div>
-									</div>
-
-								</div>
-							</div>
-						</div> <!-- Game Panel end -->
-
-					</div> <!-- Main row end -->
+				<div class="col-md-12 panel panel-default" style = "padding-top: 15px;height: 686.6px; overflow: hidden;">
+					<div ng-view class="login-animate"></div>
 				</div> <!-- Main Container end -->
 			</div>
 		</div>

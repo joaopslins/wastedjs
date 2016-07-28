@@ -20,11 +20,6 @@
     font-size: 175%;
 }
 
-.fjs-login-panel{
-    /* Needed so it won't mess with transition */
-    min-height: 176.4px;
-}
-
 .fjs-game-main{
     height : 250px;
 }
@@ -113,48 +108,62 @@
 	background-color: mediumblue;
 }
 
+.row-centered {
+	margin-top: 18%;
+}
+
 /* =============== ANIMATIONS ================ */
 
 .login-animate {
+	opacity: 1;
+}
+
+.login-animate.ng-enter {
+    -webkit-transition:1s ease all;
+    transition:1s ease all;
+	opacity: 0;
+	-webkit-transition-delay: 1s;
+	transition-delay: 1s;
+}
+
+.login-animate.ng-enter.ng-enter-active {
+	opacity: 1;
+}
+
+.login-animate.ng-leave {
+    -webkit-transition:1s ease all;
+    transition:1s ease all;
     opacity: 1;
 }
 
-.login-animate.ng-hide-add {
-    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-}
-
-.login-animate.ng-hide-remove {
-    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-}
-
-.login-animate.ng-hide {
-  opacity: 0;
+.login-animate.ng-leave.ng-leave-active {
+    opacity: 0;
 }
 
 .player-animate {
-  line-height:25px;
-  list-style:none;
-  box-sizing:border-box;
+	line-height:25px;
+	list-style:none;
+	box-sizing:border-box;
 }
 
 .player-animate.ng-move,
 .player-animate.ng-enter,
 .player-animate.ng-leave {
-  transition:all linear 0.5s;
+	transition:all linear 0.5s;
 }
 
 .player-animate.ng-leave.ng-leave-active,
 .player-animate.ng-move,
 .player-animate.ng-enter {
-  opacity:0;
-  max-height:0;
+	opacity:0;
+	max-height:0;
 }
 
 .player-animate.ng-leave,
 .player-animate.ng-move.ng-move-active,
 .player-animate.ng-enter.ng-enter-active {
-  opacity:1;
-  max-height:30px;
+	opacity:1;
+	max-height:30px;
 }
 
 .alert.ng-hide-add,
