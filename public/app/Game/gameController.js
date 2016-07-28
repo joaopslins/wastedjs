@@ -1,11 +1,8 @@
-wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
+wastedJS.controller("gameController", function($scope, $timeout, $window, $location, socket)
 {
 	//Local variables
-	$scope.loginErrorMessage = "";
 	$scope.readyToStart = false;
 	$scope.firstPlayer = false;
-	$scope.loginError = false;
-	$scope.loggedIn = 'no';
 	$scope.game = false;
 	$scope.myTurn = false;
 	$scope.phase = false;
@@ -27,103 +24,44 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 	//Bet options
 	$scope.betOptions = [];
 
-	//login button function
-	$scope.loginToggle = function()
+	//Getting players and name
+	socket.emit('request-playerlist', null, function (data){
+		$scope.players = data.playerList;
+		for (let i in $scope.players) {
+			if ($scope.players[i].name == data.name) {
+				$scope.me = $scope.players[i];
+				break;
+			}
+		}
+
+		if($scope.players.length == 1){
+			$scope.firstPlayer = true;
+		}
+	});
+
+	console.log("Scope game: " + $scope.game);
+
+	//logout button function
+	$scope.logoutToggle = function()
 	{
-		//Reset error status
-		$scope.loginError = false;
-
-		if($scope.me.name == "") return;
-		// If logging in
-		if($scope.loggedIn == "no")
-		{
-			// Animation
-			$scope.loggedIn = false;
-
-			//Tries to login into server
-			//		data = {playerList,success}
-			socket.emit('login', $scope.me.name, function(data)
-			{
-				if(data.success == 0)
-				{
-					//Update local player list
-					$scope.players = data.playerList;
-					if($scope.players.length == 0){
-						$scope.firstPlayer = true;
-					}
-					$scope.players.push($scope.me);
-
-					//Login
-					$timeout( function() {
-						$scope.loggedIn = "yes";
-					}, 550);
-				}
-				else
-				{
-					$timeout( function() {
-						//Nick taken
-						if(data.success == 1)
-						{
-							$scope.loginErrorMessage =  '<strong>Cannot login!</strong>'+
-														'<br />Nick was already taken!'
-						}
-						//Room is full
-						else if(data.success == 2)
-						{
-							$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
-														'<br />Room is full!'
-						}
-						//In game
-						else if(data.success == 3)
-						{
-							$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
-														'<br />Room in game!'
-						}
-
-						$scope.loggedIn = "no";
-						$scope.loginError = true;
-					}, 550);
-				}
-			});
-		}
-		// If logging out
-		else if($scope.loggedIn == "yes")
-		{
-			let exit = true;
-
-			if($scope.game){
-				if($window.confirm("This will end the game, are you sure?")){
-					exit = true;
-				}else{
-					exit = false;
-				}
-			}
-
-			if(exit)
-			{
-				// Animation
-				$scope.loggedIn = false;
-				$timeout( function() {
-					$scope.loggedIn = "no";
-				}, 550);
-
-				//Logout from server and reset local player list
-				socket.emit('logout');
-				$scope.players = [];
-
-				//Reset Player Configs
-				$scope.me.name = "";
-				$scope.me.ready = false;
-				$scope.me.lives = 3;
-				$scope.me.won = 0;
-				$scope.me.bet = '-';
-				$scope.me.card = '';
-
-				$scope.firstPlayer = false;
-				$scope.game = false;
+		console.log("Scope game: " + $scope.game);
+		let exit = true;
+		if ($scope.game) {
+			if ($window.confirm("This will end the game, are you sure?")) {
+				exit = true;
+			} else {
+				exit = false;
 			}
 		}
-	}
+
+		if (exit) {
+			//Disconnect
+			socket.disconnect();
+
+			//Redirect
+			$location.url("/");
+		}
+	};
 
 	// Ready button function
 	$scope.readyToggle = function()
@@ -155,7 +93,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		}
 
 		$scope.readyToStart = aux;
-	}
+	};
 
 	//Play card button function
 	$scope.playCard = function()
@@ -175,7 +113,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 			$scope.myTurn = false;
 			$scope.me.card = '';
 		}
-	}
+	};
 
 	$scope.betClick = function(index){
 		bet = $scope.betOptions[index];
@@ -183,13 +121,13 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		socket.emit('player-bet', bet);
 		$scope.myTurn = false;
 		$scope.me.bet = bet;
-	}
+	};
 
 	//Simple function if card is red
 	$scope.cardIsRed = function(card)
 	{
 		return (card[1] == 'H' || card[1] == 'D');
-	}
+	};
 
 	//Select card function
 	$scope.cardSelect = function (index)
@@ -197,7 +135,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		if ($scope.myTurn) {
 			$scope.me.card = $scope.cards[index];
 		}
-	}
+	};
 
 	//Start game - Only for host player
 	$scope.startGame = function()
@@ -206,7 +144,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		{
 			socket.emit('start-game');
 		}
-	}
+	};
 
 	//Socket listener events
 	socket.on('player-connect', function(newPlayer)
@@ -267,7 +205,7 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		if (!$scope.game) {
 			return;
 		}
-		
+
 		socket.emit('request-cards', null, function(data){
 			$scope.cards = data.cards;
 			$scope.matchNumber = $scope.cards.length;
@@ -437,32 +375,5 @@ wastedJS.controller("wastedJSctrl", function($scope, $timeout, $window, socket)
 		$scope.readyToStart = false;
 	});
 
-	socket.on('reset', function() {
-		$scope.loginErrorMessage = "";
-		$scope.readyToStart = false;
-		$scope.firstPlayer = false;
-		$scope.loginError = false;
-		$scope.loggedIn = 'no';
-		$scope.game = false;
-		$scope.myTurn = false;
-		$scope.phase = false;
-
-		$scope.me = {
-			name : "",
-			ready : false,
-			lives : 3,
-			won : 0,
-			bet : '-',
-			card : ''
-		};
-
-		// Local player list
-		$scope.players = [];
-
-		// Local player card list
-		$scope.cards = [];
-
-		//Bet options
-		$scope.betOptions = [];
-	});
+		console.log("Scope game: " + $scope.game);
 });

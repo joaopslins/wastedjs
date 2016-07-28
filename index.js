@@ -105,27 +105,12 @@ var disconnect_C = function(socket){
 //Server connection code
 io.on('connection', function (socket)
 {
-    if (socket.name == null) {
-        console.log("undefined connected!");
-        socket.emit('reset');
-    } else {
-        var isLogged = false;
-        for (var i in players) {
-            if (players[i].name == socket.name) {
-                isLogged = true;
-            }
-        }
-        if (!isLogged) {
-            console.log("ghost player '" + socket.name + "' detected!");
-            socket.emit('reset');
-        }
-    }
-
 	socket.on('login', function (name, callback)
 	{
         console.log(name + " login");
 
         var success = 0;
+
         //If name not available
         if(!isNameAvailable(name)){
             success = 1;
@@ -140,12 +125,9 @@ io.on('connection', function (socket)
         }
 
         //Return playerlist and success to requested player
-        callback({
-            "playerList" : createClientPlayerList(players),
-            "success" : success
-        });
+        callback(success);
 
-        if(success == 0){
+        if (success == 0) {
             //Add new player to server player list and socket
     		socket.name = name;
     		var newPlayer = new Player (name);
@@ -155,11 +137,6 @@ io.on('connection', function (socket)
             socket.broadcast.emit('player-connect',convertPlayer(newPlayer));
         }
 	});
-
-    socket.on('logout', function(){
-        console.log(socket.name + " logout");
-        disconnect_C(socket);
-    });
 
     // Client = {name,ready}
 	socket.on('ready', function(client)
@@ -243,6 +220,14 @@ io.on('connection', function (socket)
         callback({
             'cards' : game.getCardsFromPlayer(socket.name)
         });
+    });
+
+    socket.on('request-playerlist', function(data, callback) {
+        console.log(socket.name + " asked for playerlist");
+        callback({
+            'name' : socket.name,
+            'playerList' : createClientPlayerList(players),
+        })
     });
 
 	socket.on('disconnect', function(){
