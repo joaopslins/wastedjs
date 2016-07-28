@@ -134,6 +134,8 @@
     -webkit-transition:1s ease all;
     transition:1s ease all;
     opacity: 1;
+	height: 0px;
+	overflow: hidden;
 }
 
 .login-animate.ng-leave.ng-leave-active {
