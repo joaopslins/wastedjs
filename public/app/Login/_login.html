@@ -1,33 +1,37 @@
 <!-- Row = Login and Game -->
-<div class="row row-centered">
-    <div class="col-md-4 col-md-offset-4">
-        <!-- Login Panel -->
-        <div class="panel panel-default">
-            <div class="panel-heading" style = "text-align:center">
-                <h3 class="panel-title"><b>Login</b></h3>
-            </div>
+<div class="row">
+	<div class="col-md-12 panel panel-default" style = "padding-top: 15px;height: 686.6px;">
+        <div class="row row-centered">
+            <div class="col-xs-4 col-xs-offset-4">
+                <!-- Login Panel -->
+                <div class="panel panel-default">
+                    <div class="panel-heading" style = "text-align:center">
+                        <h3 class="panel-title"><b>Login</b></h3>
+                    </div>
 
-            <div class="panel-body">
-                <div>
-                    <div class="row">
-                        <div class="col-xs-3" style="text-align:center">
-                            <h4>Nick:</h4>
-                        </div>
-                        <div class="col-xs-9">
-                            <input class="form-control" ng-model="name" type="text"  ng-keydown="$event.keyCode == 13 ? loginToggle() : null">
+                    <div class="panel-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-xs-3" style="text-align:center">
+                                    <h4>Nick:</h4>
+                                </div>
+                                <div class="col-xs-9">
+                                    <input class="form-control" ng-model="name" type="text"  ng-keydown="$event.keyCode == 13 ? loginToggle() : null">
+                                </div>
+                            </div>
+                            <br />
+                            <button type="button" class="btn btn-lg btn-default center-block" ng-click="loginToggle()">
+                                Login
+                            </button>
                         </div>
                     </div>
-                    <br />
-                    <button type="button" class="btn btn-lg btn-default center-block" ng-click="loginToggle()">
-                        Login
-                    </button>
                 </div>
+
+                <!-- Login Alert Box -->
+                <div class="alert alert-danger" style="text-align:center" ng-show="loginError" ng-bind-html="loginErrorMessage">
+                </div>
+
             </div>
-        </div>
-
-        <!-- Login Alert Box -->
-        <div class="alert alert-danger" style="text-align:center" ng-show="loginError" ng-bind-html="loginErrorMessage">
-        </div>
-
+        </div> <!-- Main row end -->
     </div>
-</div> <!-- Main row end -->
+</div>

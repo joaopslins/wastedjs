@@ -1,50 +1,52 @@
-<!-- Row = Login and Game -->
 <div class="row">
+    <div class="col-md-12 panel panel-default" style = "padding-top: 15px;">
+        <!-- Row = Login and Game -->
+        <div class="row">
 
-    <div class="col-md-3 col-xs-4">
-        <!-- Login Panel -->
-        <div class="panel panel-default fjs-login-panel">
-            <div class="panel-heading" style = "text-align:center">
-                <h3 class="panel-title"><b>Login</b></h3>
-            </div>
-
-            <div class="panel-body">
-                <div>
-                    <div style = "text-align:center">
-                        <h4>You are logged in, {{ me.name }}</h4>
+            <div class="col-md-3 col-xs-4">
+                <!-- Login Panel -->
+                <div class="panel panel-default fjs-login-panel">
+                    <div class="panel-heading" style = "text-align:center">
+                        <h3 class="panel-title"><b>Login</b></h3>
                     </div>
-                    <br />
-                    <button type="button" class="btn btn-lg btn-danger center-block" ng-click="logoutToggle()">
-                        Logout
+
+                    <div class="panel-body">
+                        <div>
+                            <div style = "text-align:center">
+                                <h4>You are logged in, {{ me.name }}</h4>
+                            </div>
+                            <br />
+                            <button type="button" class="btn btn-lg btn-danger center-block" ng-click="logoutToggle()">
+                                Logout
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Player Panel -->
+                <div class="panel panel-default">
+
+                    <div class="panel-heading"  style = "text-align:center">
+                        <h3 class="panel-title"><b>Players</b></h3>
+                    </div>
+
+                    <!-- Player List -->
+                    <div class="panel-body"  style = "text-align:center">
+                        <div ng-repeat="player in players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
+                            {{player.name}}
+                        </div>
+                    </div>
+
+                    <!-- Ready Button -->
+                    <div class="panel-footer">
+                        <button type="button" class="btn btn-danger center-block"
+                        ng-click="readyToggle()"
+                        ng-show="!game">
+                        Ready
                     </button>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Player Panel -->
-        <div class="panel panel-default">
-
-            <div class="panel-heading"  style = "text-align:center">
-                <h3 class="panel-title"><b>Players</b></h3>
-            </div>
-
-            <!-- Player List -->
-            <div class="panel-body"  style = "text-align:center">
-                <div ng-repeat="player in players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
-                    {{player.name}}
-                </div>
-            </div>
-
-            <!-- Ready Button -->
-            <div class="panel-footer">
-                <button type="button" class="btn btn-danger center-block"
-                    ng-click="readyToggle()"
-                    ng-show="!game">
-                    Ready
-                </button>
-                <br />
-                <button type="button" class="btn start-disabled center-block"
+                    <br />
+                    <button type="button" class="btn start-disabled center-block"
                     ng-class="{'start-button' : readyToStart}"
                     ng-show="firstPlayer && !game"
                     ng-click="startGame()">
@@ -87,46 +89,47 @@
                         </tr>
                         <tr>
                             <td
-                                class = "fjs-card"
-                                ng-repeat = "player in players"
-                                ng-bind-html = "player.card | cardFilter"
-                                ng-class="cardIsRed(player.card) ? 'red-card' : '' ">
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                            class = "fjs-card"
+                            ng-repeat = "player in players"
+                            ng-bind-html = "player.card | cardFilter"
+                            ng-class="cardIsRed(player.card) ? 'red-card' : '' ">
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
-                <div class="well" ng-show="phase == 'bet' && myTurn" style="text-align:center">
-                    <h4> Bet! </h4>
-                    <button type="button" class="btn btn-primary"
-                            ng-repeat="bet in betOptions"
-                            ng-click="betClick($index)">
-                        {{bet}}
-                    </button>
-                </div>
+            <div class="well" ng-show="phase == 'bet' && myTurn" style="text-align:center">
+                <h4> Bet! </h4>
+                <button type="button" class="btn btn-primary"
+                ng-repeat="bet in betOptions"
+                ng-click="betClick($index)">
+                {{bet}}
+            </button>
+        </div>
 
-                <!-- Player hand section -->
-                <div class="well well-lg" style="text-align:center" >
-                    <div class="row">
-                        <div
-                            class = "fjs-card fjs-hand"
-                            ng-repeat="card in cards"
-                            ng-bind-html = "card | cardFilter"
-                            ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == me.card}"
-                            ng-click = "cardSelect($index)" >
-                        </div>
-                    </div>
-                    <div class="row">
-                        <button type="button" class="btn center-block"
-                            ng-click="playCard()"
-                            ng-class="{'play-active': (myTurn && phase == 'play'), 'play-disabled':!(myTurn && phase == 'play')}">
-                            Play
-                        </button>
-                    </div>
-                </div>
-
+        <!-- Player hand section -->
+        <div class="well well-lg" style="text-align:center" >
+            <div class="row">
+                <div
+                class = "fjs-card fjs-hand"
+                ng-repeat="card in cards"
+                ng-bind-html = "card | cardFilter"
+                ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == me.card}"
+                ng-click = "cardSelect($index)" >
             </div>
         </div>
-    </div> <!-- Game Panel end -->
+        <div class="row">
+            <button type="button" class="btn center-block"
+            ng-click="playCard()"
+            ng-class="{'play-active': (myTurn && phase == 'play'), 'play-disabled':!(myTurn && phase == 'play')}">
+            Play
+        </button>
+    </div>
+</div>
 
+</div>
+</div>
+</div> <!-- Game Panel end -->
 </div> <!-- Main row end -->
+</div>
+</div>

@@ -39,12 +39,9 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 		}
 	});
 
-	console.log("Scope game: " + $scope.game);
-
 	//logout button function
 	$scope.logoutToggle = function()
 	{
-		console.log("Scope game: " + $scope.game);
 		let exit = true;
 		if ($scope.game) {
 			if ($window.confirm("This will end the game, are you sure?")) {
@@ -201,11 +198,6 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 	});
 
 	socket.on('game-start-notification', function(playerToPlay){
-		//If player is not in game, don't check
-		if (!$scope.game) {
-			return;
-		}
-
 		socket.emit('request-cards', null, function(data){
 			$scope.cards = data.cards;
 			$scope.matchNumber = $scope.cards.length;
@@ -322,11 +314,6 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 	});
 
 	socket.on('new-match', function (players, playerToPlay) {
-		//If player is not in game, don't check
-		if (!$scope.game) {
-			return;
-		}
-
 		//Updating player list
 		for (let i in $scope.players) {
 			$scope.players[i].lives = players[i].lives;
@@ -374,6 +361,4 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 		$scope.phase = false;
 		$scope.readyToStart = false;
 	});
-
-		console.log("Scope game: " + $scope.game);
 });
