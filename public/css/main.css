@@ -112,6 +112,11 @@
 	margin-top: 18%;
 }
 
+.hearts-lives {
+	font-size: 200%;
+	color: red;
+}
+
 /* =============== ANIMATIONS ================ */
 
 .login-animate {

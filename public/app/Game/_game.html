@@ -75,7 +75,9 @@
                         </tr>
                         <tr ng-repeat="player in players">
                             <td>{{player.name}}</td>
-                            <td>{{player.lives}}</td>
+                            <td> <span ng-repeat="i in player.lives | livesCount" class="hearts-lives">
+                                &hearts;
+                            </span> </td>
                             <td>{{player.won}} / {{player.bet}}</td>
                         </tr>
                     </table>
