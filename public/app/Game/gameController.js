@@ -4,7 +4,6 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 	$scope.readyToStart = false;
 	$scope.firstPlayer = false;
 	$scope.game = false;
-	$scope.myTurn = false;
 	$scope.phase = false;
 	$scope.me = {
 		name : "",
@@ -12,7 +11,8 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 		lives : 3,
 		won : 0,
 		bet : '-',
-		card : ''
+		card : '',
+		turn: false
 	};
 
 	// Local player list
@@ -95,7 +95,7 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 	//Play card button function
 	$scope.playCard = function()
 	{
-		if($scope.myTurn && $scope.phase == 'play' && $scope.me.card != ''){
+		if($scope.me.turn && $scope.phase == 'play' && $scope.me.card != ''){
 			socket.emit('player-play-card', $scope.me.card);
 
 			//Remove played card
@@ -107,7 +107,7 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 				}
 			});
 
-			$scope.myTurn = false;
+			$scope.me.turn = false;
 			$scope.me.card = '';
 		}
 	};
@@ -116,7 +116,7 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 		bet = $scope.betOptions[index];
 
 		socket.emit('player-bet', bet);
-		$scope.myTurn = false;
+		$scope.me.turn = false;
 		$scope.me.bet = bet;
 	};
 
@@ -129,7 +129,7 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 	//Select card function
 	$scope.cardSelect = function (index)
 	{
-		if ($scope.myTurn) {
+		if ($scope.me.turn) {
 			$scope.me.card = $scope.cards[index];
 		}
 	};
@@ -219,29 +219,31 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 			$scope.players[i].won = 0;
 			$scope.players[i].bet = '-';
 			$scope.players[i].card = '';
-		}
 
-		//Set turn
-		if (playerToPlay == $scope.me.name) {
-			$scope.myTurn = true;
-		} else {
-			$scope.myTurn = false;
+			if ($scope.players[i].name == playerToPlay) {
+				$scope.players[i].turn = true;
+			} else {
+				$scope.players[i].turn = false;
+			}
 		}
 	});
 
 	socket.on('bet-update', function(bet, playerWhoBet, nextPlayer, startPlayPhase){
-		//Updates bet locally
+		//Updates bet locally and set turn
 		for (let i in $scope.players){
-			if($scope.players[i].name == playerWhoBet){
+			if ($scope.players[i].name == playerWhoBet) {
 				$scope.players[i].bet = bet;
-				break;
+			}
+
+			if ($scope.players[i].name == nextPlayer) {
+				$scope.players[i].turn = true;
+			} else {
+				$scope.players[i].turn = false;
 			}
 		}
 
-		//Set turn
-		if ($scope.me.name == nextPlayer) {
-			$scope.myTurn = true;
-
+		//Set bets
+		if ($scope.me.turn) {
 			//Check if it's last player
 			let isLast = true;
 			for (let i in $scope.players) {
@@ -271,8 +273,6 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 					}
 				});
 			}
-		} else {
-			$scope.myTurn = false;
 		}
 
 		//Change phase to play
@@ -282,19 +282,17 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 	});
 
 	socket.on('play-update', function (card, playerWhoPlayed, nextPlayer) {
-		//Update Card locally
+		//Update Card and turn locally
 		for (let i in $scope.players) {
 			if ($scope.players[i].name == playerWhoPlayed) {
 				$scope.players[i].card = card;
-				break;
 			}
-		}
 
-		//Set next turn
-		if ($scope.me.name == nextPlayer) {
-			$scope.myTurn = true;
-		} else {
-			$scope.myTurn = false;
+			if ($scope.players[i].name == nextPlayer) {
+				$scope.players[i].turn = true;
+			} else {
+				$scope.players[i].turn = false;
+			}
 		}
 	});
 
@@ -303,13 +301,12 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 		for (let i in $scope.players) {
 			$scope.players[i].won = players[i].won;
 			$scope.players[i].card = '';
-		}
 
-		//Set next turn
-		if ($scope.me.name == playerToPlay) {
-			$scope.myTurn = true;
-		} else {
-			$scope.myTurn = false;
+			if ($scope.players[i].name == playerToPlay) {
+				$scope.players[i].turn = true;
+			} else {
+				$scope.players[i].turn = false;
+			}
 		}
 	});
 
@@ -320,6 +317,12 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 			$scope.players[i].won = 0;
 			$scope.players[i].card = '';
 			$scope.players[i].bet = '-';
+
+			if ($scope.players[i].name == playerToPlay) {
+				$scope.players[i].turn = true;
+			} else {
+				$scope.players[i].turn = false;
+			}
 		}
 
 		//Updating cards
@@ -336,12 +339,6 @@ wastedJS.controller("gameController", function($scope, $timeout, $window, $locat
 
 		//Update phase and playerturn
 		$scope.phase = "bet";
-
-		if ($scope.me.name == playerToPlay) {
-			$scope.myTurn = true;
-		} else {
-			$scope.myTurn = false;
-		}
 	});
 
 	socket.on('end-game', function (players) {

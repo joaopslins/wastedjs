@@ -11,12 +11,12 @@
 .not-ready{
     font-weight: normal;
     font-size: 150%;
-    color: darkred;
+    color: darkgray;
 }
 
 .ready{
     font-weight: bold;
-    color: forestgreen;
+    color: #337ab7;
     font-size: 175%;
 }
 
@@ -115,6 +115,12 @@
 .hearts-lives {
 	font-size: 200%;
 	color: red;
+}
+
+.selected-player {
+	background-color: #337ab7;
+	color: white;
+	font-weight: bold;
 }
 
 /* =============== ANIMATIONS ================ */
