@@ -1,47 +1,54 @@
-wastedJS.controller("loginController", function($scope, $timeout, $location, socket)
-{
-	//Local variables
-    $scope.name = '';
-    $scope.loginError = false;
-    $scope.loginErrorMessage = '';
+(function() {
+    'use strict';
 
-    if (socket.isConnected()) {
-        socket.disconnect();
-    }
+    angular
+        .module("wastedJSapp")
+        .controller("loginController", loginCtrl);
 
-	//login button function
-	$scope.loginToggle = function()
-	{
-		//Reset error status
-		$scope.loginError = false;
+    function loginCtrl ($scope, $timeout, $location, socket) {
+    	//Local variables
+        $scope.name = '';
+        $scope.loginError = false;
+        $scope.loginErrorMessage = '';
 
-        //Don't login with null name
-    	if($scope.name == "") return;
+        if (socket.isConnected()) {
+            socket.disconnect();
+        }
 
-        //Tries to login into server
-        socket.connect();
-        socket.emit('login', $scope.name, function(success)
-        {
-            if(success == 0) {
-                //Redirect view
-                $location.url("/game");
-            } else {
-            	$timeout( function() {
-            		//Nick taken
-            		if (success == 1) {
-            			$scope.loginErrorMessage =  '<strong>Cannot login!</strong>'+
-            										'<br />Nick was already taken!'
-            		} else if(success == 2) {
-            			$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
-            										'<br />Room is full!'
-            		} else if(success == 3)	{
-            			$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
-            										'<br />Room in game!'
-            		}
+    	//login button function
+    	$scope.loginToggle = function()
+    	{
+    		//Reset error status
+    		$scope.loginError = false;
 
-            		$scope.loginError = true;
-            	}, 550);
-            }
-        });
-	}
-});
+            //Don't login with null name
+        	if($scope.name == "") return;
+
+            //Tries to login into server
+            socket.connect();
+            socket.emit('login', $scope.name, function(success)
+            {
+                if(success == 0) {
+                    //Redirect view
+                    $location.url("/game");
+                } else {
+                	$timeout( function() {
+                		//Nick taken
+                		if (success == 1) {
+                			$scope.loginErrorMessage =  '<strong>Cannot login!</strong>'+
+                										'<br />Nick was already taken!'
+                		} else if(success == 2) {
+                			$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+                										'<br />Room is full!'
+                		} else if(success == 3)	{
+                			$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+                										'<br />Room in game!'
+                		}
+
+                		$scope.loginError = true;
+                	}, 550);
+                }
+            });
+    	}
+    };
+})();
