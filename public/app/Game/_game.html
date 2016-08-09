@@ -13,10 +13,10 @@
                     <div class="panel-body">
                         <div>
                             <div style = "text-align:center">
-                                <h4>You are logged in, {{ me.name }}</h4>
+                                <h4>You are logged in, {{ game.me.name }}</h4>
                             </div>
                             <br />
-                            <button type="button" class="btn btn-lg btn-danger center-block" ng-click="logoutToggle()">
+                            <button type="button" class="btn btn-lg btn-danger center-block" ng-click="game.logoutToggle()">
                                 Logout
                             </button>
                         </div>
@@ -25,7 +25,7 @@
                 </div>
 
                 <!-- Player Panel -->
-                <div class="panel panel-default" ng-show="!game">
+                <div class="panel panel-default" ng-show="!game.isUp">
 
                     <div class="panel-heading"  style = "text-align:center">
                         <h3 class="panel-title"><b>Players</b></h3>
@@ -33,7 +33,7 @@
 
                     <!-- Player List -->
                     <div class="panel-body"  style = "text-align:center">
-                        <div ng-repeat="player in players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
+                        <div ng-repeat="player in game.players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
                             {{player.name}}
                         </div>
                     </div>
@@ -41,15 +41,15 @@
                     <!-- Ready Button -->
                     <div class="panel-footer">
                         <button type="button" class="btn btn-danger center-block"
-                        ng-click="readyToggle()"
-                        ng-show="!game">
+                        ng-click="game.readyToggle()"
+                        ng-show="!game.isUp">
                         Ready
                     </button>
                     <br />
                     <button type="button" class="btn start-disabled center-block"
-                    ng-class="{'start-button' : readyToStart}"
-                    ng-show="firstPlayer && !game"
-                    ng-click="startGame()">
+                    ng-class="{'start-button' : game.readyToStart}"
+                    ng-show="game.firstPlayer && !game.isUp"
+                    ng-click="game.startGame()">
                     Start Game
                 </button>
             </div>
@@ -58,7 +58,7 @@
 
     <!-- Game Panel -->
     <div class="col-md-9 col-xs-8">
-        <div class="panel panel-default" ng-show = "game">
+        <div class="panel panel-default" ng-show = "game.isUp">
             <div class="panel-heading" style = "text-align:center">
                 <h3 class="panel-title"><b>Game</b></h3>
             </div>
@@ -73,7 +73,7 @@
                             <td> Lives </td>
                             <td> Won/Bet </td>
                         </tr>
-                        <tr ng-repeat="player in players">
+                        <tr ng-repeat="player in game.players">
                             <td>{{player.name}}</td>
                             <td> <span ng-repeat="i in player.lives | livesCount" class="hearts-lives">
                                 &hearts;
@@ -88,13 +88,13 @@
                     <table class ="table table-bordered fjs-player-cards">
                         <tr class="table-header">
                             <td
-                            ng-repeat = "player in players"
+                            ng-repeat = "player in game.players"
                             ng-class = "{'selected-player' : player.turn}">{{player.name}}</td>
                         </tr>
                         <tr>
                             <td
                             class = "fjs-card"
-                            ng-repeat = "player in players"
+                            ng-repeat = "player in game.players"
                             ng-bind-html = "player.card | cardFilter"
                             ng-class="cardIsRed(player.card) ? 'red-card' : '' ">
                             </td>
@@ -103,11 +103,11 @@
                 </div>
 
                 <!-- Bet panel -->
-                <div class="well" ng-show="phase == 'bet' && me.turn" style="text-align:center">
+                <div class="well" ng-show="game.phase == 'bet' && game.me.turn" style="text-align:center">
                     <h4> Bet! </h4>
                     <button type="button" class="btn btn-primary"
-                    ng-repeat="bet in betOptions"
-                    ng-click="betClick($index)">
+                    ng-repeat="bet in game.betOptions"
+                    ng-click="game.betClick($index)">
                     {{bet}}
                     </button>
                 </div>
@@ -117,16 +117,16 @@
                     <div class="row">
                         <div
                         class = "fjs-card fjs-hand"
-                        ng-repeat="card in cards"
+                        ng-repeat="card in game.cards"
                         ng-bind-html = "card | cardFilter"
-                        ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == me.card}"
-                        ng-click = "cardSelect($index)" >
+                        ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == game.me.card}"
+                        ng-click = "game.cardSelect($index)" >
                         </div>
                     </div>
                     <div class="row">
                         <button type="button" class="btn center-block"
-                        ng-click="playCard()"
-                        ng-class="{'play-active': (me.turn && phase == 'play'), 'play-disabled':!(me.turn && phase == 'play')}">
+                        ng-click="game.playCard()"
+                        ng-class="{'play-active': (game.me.turn && game.phase == 'play'), 'play-disabled':!(game.me.turn && game.phase == 'play')}">
                         Play
                         </button>
                     </div>

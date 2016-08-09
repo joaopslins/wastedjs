@@ -3,14 +3,15 @@
     	.module("wastedJSapp")
 		.controller("gameController", gameCtrl);
 
-	function gameCtrl($scope, $timeout, $window, $location, socket)
-	{
+	function gameCtrl($timeout, $window, $location, socket) {
+        var vm = this;
+
 		//Local variables
-		$scope.readyToStart = false;
-		$scope.firstPlayer = false;
-		$scope.game = false;
-		$scope.phase = false;
-		$scope.me = {
+		vm.readyToStart = false;
+		vm.firstPlayer = false;
+		vm.isUp = false;
+		vm.phase = false;
+		vm.me = {
 			name : "",
 			ready : false,
 			lives : 3,
@@ -21,34 +22,64 @@
 		};
 
 		// Local player list
-		$scope.players = [];
+		vm.players = [];
 
 		// Local player card list
-		$scope.cards = [];
+		vm.cards = [];
 
 		//Bet options
-		$scope.betOptions = [];
+		vm.betOptions = [];
 
-		//Getting players and name
-		socket.emit('request-playerlist', null, function (data){
-			$scope.players = data.playerList;
-			for (let i in $scope.players) {
-				if ($scope.players[i].name == data.name) {
-					$scope.me = $scope.players[i];
-					break;
-				}
-			}
+        //Function Binds
+        vm.logoutToggle = logoutToggle;
+        vm.readyToggle = readyToggle;
+        vm.playCard = playCard;
+        vm.betClick = betClick;
+        vm.cardIsRed = cardIsRed;
+        vm.cardSelect = cardSelect;
+        vm.startGame = startGame;
 
-			if($scope.players.length == 1){
-				$scope.firstPlayer = true;
-			}
-		});
+        //Socket listener events
+		socket.on('player-connect', playerConnectCB);
+        socket.on('player-disconnect', playerDisconnectCB);
+        socket.on('update-client-ready', updateClientReadyCB);
+        socket.on('game-start-notification', gameStartNotificationCB);
+        socket.on('bet-update', betUpdateCB);
+        socket.on('play-update', playUpdateCB);
+        socket.on('new-round', newRoundCB);
+        socket.on('new-match', newMatchCB);
+        socket.on('end-game', endGameCB);
+
+        activate();
+
+        //////////////////////////////
+
+        function activate () {
+            //Getting players and name
+            socket.emit('request-playerlist', null, function (data){
+                vm.players = data.playerList;
+                for (let i in vm.players) {
+                    if (vm.players[i].name == data.name) {
+                        vm.me = vm.players[i];
+                        break;
+                    }
+                }
+
+                if(vm.players.length == 1){
+                    vm.firstPlayer = true;
+                }
+            });
+        }
+
+
+        //////////////////////////////
+        // Function Implementations //
+        //////////////////////////////
 
 		//logout button function
-		$scope.logoutToggle = function()
-		{
+		function logoutToggle() {
 			let exit = true;
-			if ($scope.game) {
+			if (vm.isUp) {
 				if ($window.confirm("This will end the game, are you sure?")) {
 					exit = true;
 				} else {
@@ -66,194 +97,181 @@
 		};
 
 		// Ready button function
-		$scope.readyToggle = function()
-		{
+		function readyToggle() {
 			let aux = true;
 
 			//Toggle ready variable
-			$scope.me.ready = !$scope.me.ready;
+			vm.me.ready = !vm.me.ready;
 
 			// Update to server
 			socket.emit('ready', {
-				name: $scope.me.name,
-				ready: $scope.me.ready
+				name: vm.me.name,
+				ready: vm.me.ready
 			});
 
 			//At least 2 players
-			if($scope.players.length == 1)
-			{
+			if (vm.players.length == 1) {
 				aux = false;
 			}
 
 			//Check if everyone is ready
-			for(i in $scope.players)
-			{
-				if(!$scope.players[i].ready)
-				{
+			for (i in vm.players) {
+				if (!vm.players[i].ready) {
 					aux = false;
 				}
 			}
 
-			$scope.readyToStart = aux;
+			vm.readyToStart = aux;
 		};
 
 		//Play card button function
-		$scope.playCard = function()
-		{
-			if($scope.me.turn && $scope.phase == 'play' && $scope.me.card != ''){
-				socket.emit('player-play-card', $scope.me.card);
+		function playCard() {
+			if (vm.me.turn && vm.phase == 'play' && vm.me.card != '') {
+				socket.emit('player-play-card', vm.me.card);
 
 				//Remove played card
-				$scope.cards = $scope.cards.filter(function (c) {
-					if (c == $scope.me.card) {
+				vm.cards = vm.cards.filter(function (c) {
+					if (c == vm.me.card) {
 						return false;
 					} else {
 						return true;
 					}
 				});
 
-				$scope.me.turn = false;
-				$scope.me.card = '';
+				vm.me.turn = false;
+				vm.me.card = '';
 			}
 		};
 
-		$scope.betClick = function(index){
-			bet = $scope.betOptions[index];
+		function betClick(index) {
+			bet = vm.betOptions[index];
 
 			socket.emit('player-bet', bet);
-			$scope.me.turn = false;
-			$scope.me.bet = bet;
+			vm.me.turn = false;
+			vm.me.bet = bet;
 		};
 
 		//Simple function if card is red
-		$scope.cardIsRed = function(card)
-		{
+		function cardIsRed(card) {
 			return (card[1] == 'H' || card[1] == 'D');
 		};
 
 		//Select card function
-		$scope.cardSelect = function (index)
-		{
-			if ($scope.me.turn) {
-				$scope.me.card = $scope.cards[index];
+		function cardSelect(index) {
+			if (vm.me.turn) {
+				vm.me.card = vm.cards[index];
 			}
 		};
 
 		//Start game - Only for host player
-		$scope.startGame = function()
-		{
-			if($scope.readyToStart)
-			{
+		function startGame() {
+			if (vm.readyToStart) {
 				socket.emit('start-game');
 			}
 		};
 
-		//Socket listener events
-		socket.on('player-connect', function(newPlayer)
-		{
-			$scope.players.push(newPlayer);
+        /////////////////////////////
+        //Socket listener callbacks//
+        /////////////////////////////
 
-			$scope.readyToStart = false;
-		});
+        function playerConnectCB(newPlayer) {
+			vm.players.push(newPlayer);
 
-		socket.on('player-disconnect', function(dcName)
-		{
-			$scope.players = $scope.players.filter(function(player) {
+			vm.readyToStart = false;
+		};
+
+		function playerDisconnectCB(dcName) {
+			vm.players = vm.players.filter(function(player) {
 				return player.name != dcName;
 			});
 
-			if ($scope.players[0].name == $scope.me.name) {
-				$scope.firstPlayer = true;
+			if (vm.players[0].name == vm.me.name) {
+				vm.firstPlayer = true;
 			}
 
-			$scope.readyToStart = false;
+			vm.readyToStart = false;
 
 			//If ongoing game
-			if ($scope.game) {
-				$scope.game = false;
-				$scope.me.ready = false;
+			if (vm.isUp) {
+				vm.isUp = false;
+				vm.me.ready = false;
 			}
-		});
+		};
 
-		socket.on('update-client-ready', function(client)
-		{
+		function updateClientReadyCB(client) {
 			let aux = true;
-			for(i in $scope.players)
-			{
+			for (i in vm.players) {
 				//Update player ready in local player list
-				if ($scope.players[i].name == client.name)
-				{
-					$scope.players[i].ready = client.ready;
+				if (vm.players[i].name == client.name) {
+					vm.players[i].ready = client.ready;
 				}
 
 				//Check if everyone is ready
-				if(!$scope.players[i].ready)
-				{
+				if (!vm.players[i].ready) {
 					aux = false;
 				}
 			}
 
 			//At least 2 players
-			if($scope.players.length == 1)
-			{
+			if (vm.players.length == 1) {
 				aux = false;
 			}
 
-			$scope.readyToStart = aux;
-		});
+			vm.readyToStart = aux;
+		};
 
-		socket.on('game-start-notification', function(playerToPlay){
-			socket.emit('request-cards', null, function(data){
-				$scope.cards = data.cards;
-				$scope.matchNumber = $scope.cards.length;
+		function gameStartNotificationCB(playerToPlay) {
+			socket.emit('request-cards', null, function(data) {
+				vm.cards = data.cards;
+				vm.matchNumber = vm.cards.length;
 
-				$scope.betOptions.length = 0;
-				for(var i = 0; i < $scope.matchNumber; i++){
-					$scope.betOptions.push(i);
+				vm.betOptions.length = 0;
+				for (var i = 0; i < vm.matchNumber; i++) {
+					vm.betOptions.push(i);
 				}
-				$scope.betOptions.push($scope.matchNumber);
+				vm.betOptions.push(vm.matchNumber);
 			});
 
 			//Set flags
-			$scope.game = true;
-			$scope.phase = "bet";
+			vm.isUp = true;
+			vm.phase = "bet";
 
 			//Reset Players Config
-			for (let i in $scope.players){
-				$scope.players[i].lives = 3;
-				$scope.players[i].won = 0;
-				$scope.players[i].bet = '-';
-				$scope.players[i].card = '';
+			for (let i in vm.players){
+				vm.players[i].lives = 3;
+				vm.players[i].won = 0;
+				vm.players[i].bet = '-';
+				vm.players[i].card = '';
 
-				if ($scope.players[i].name == playerToPlay) {
-					$scope.players[i].turn = true;
+				if (vm.players[i].name == playerToPlay) {
+					vm.players[i].turn = true;
 				} else {
-					$scope.players[i].turn = false;
+					vm.players[i].turn = false;
 				}
 			}
-		});
+		};
 
-		socket.on('bet-update', function(bet, playerWhoBet, nextPlayer, startPlayPhase){
+		function betUpdateCB(bet, playerWhoBet, nextPlayer, startPlayPhase) {
 			//Updates bet locally and set turn
-			for (let i in $scope.players){
-				if ($scope.players[i].name == playerWhoBet) {
-					$scope.players[i].bet = bet;
+			for (let i in vm.players) {
+				if (vm.players[i].name == playerWhoBet) {
+					vm.players[i].bet = bet;
 				}
 
-				if ($scope.players[i].name == nextPlayer) {
-					$scope.players[i].turn = true;
+				if (vm.players[i].name == nextPlayer) {
+					vm.players[i].turn = true;
 				} else {
-					$scope.players[i].turn = false;
+					vm.players[i].turn = false;
 				}
 			}
 
 			//Set bets
-			if ($scope.me.turn) {
+			if (vm.me.turn) {
 				//Check if it's last player
 				let isLast = true;
-				for (let i in $scope.players) {
+				for (let i in vm.players) {
 					//If there is a player who didn't bet and is alive, is not last
-					if ($scope.players[i].name != $scope.me.name && $scope.players[i].bet == '-' && $scope.players[i].lives > 0) {
+					if (vm.players[i].name != vm.me.name && vm.players[i].bet == '-' && vm.players[i].lives > 0) {
 						isLast = false;
 						break;
 					}
@@ -262,15 +280,15 @@
 				//Check which bet is blocked
 				if (isLast) {
 					let betSum = 0;
-					for (let i in $scope.players) {
-						if ($scope.players[i].name != $scope.me.name && $scope.players[i].lives > 0) {
-							betSum += $scope.players[i].bet;
+					for (let i in vm.players) {
+						if (vm.players[i].name != vm.me.name && vm.players[i].lives > 0) {
+							betSum += vm.players[i].bet;
 						}
 					}
 
-					let cantBet = $scope.matchNumber - betSum;
+					let cantBet = vm.matchNumber - betSum;
 
-					$scope.betOptions = $scope.betOptions.filter(function(iBet) {
+					vm.betOptions = vm.betOptions.filter(function(iBet) {
 						if  (iBet != cantBet) {
 							return true;
 						} else {
@@ -282,86 +300,86 @@
 
 			//Change phase to play
 			if (startPlayPhase) {
-				$scope.phase = "play";
+				vm.phase = "play";
 			}
-		});
+		};
 
-		socket.on('play-update', function (card, playerWhoPlayed, nextPlayer) {
+		function playUpdateCB (card, playerWhoPlayed, nextPlayer) {
 			//Update Card and turn locally
-			for (let i in $scope.players) {
-				if ($scope.players[i].name == playerWhoPlayed) {
-					$scope.players[i].card = card;
+			for (let i in vm.players) {
+				if (vm.players[i].name == playerWhoPlayed) {
+					vm.players[i].card = card;
 				}
 
-				if ($scope.players[i].name == nextPlayer) {
-					$scope.players[i].turn = true;
+				if (vm.players[i].name == nextPlayer) {
+					vm.players[i].turn = true;
 				} else {
-					$scope.players[i].turn = false;
-				}
-			}
-		});
-
-		socket.on('new-round', function (players, playerToPlay){
-			//Updating player list
-			for (let i in $scope.players) {
-				$scope.players[i].won = players[i].won;
-				$scope.players[i].card = '';
-
-				if ($scope.players[i].name == playerToPlay) {
-					$scope.players[i].turn = true;
-				} else {
-					$scope.players[i].turn = false;
+					vm.players[i].turn = false;
 				}
 			}
-		});
+		};
 
-		socket.on('new-match', function (players, playerToPlay) {
+        function newRoundCB(players, playerToPlay) {
 			//Updating player list
-			for (let i in $scope.players) {
-				$scope.players[i].lives = players[i].lives;
-				$scope.players[i].won = 0;
-				$scope.players[i].card = '';
-				$scope.players[i].bet = '-';
+			for (let i in vm.players) {
+				vm.players[i].won = players[i].won;
+				vm.players[i].card = '';
 
-				if ($scope.players[i].name == playerToPlay) {
-					$scope.players[i].turn = true;
+				if (vm.players[i].name == playerToPlay) {
+					vm.players[i].turn = true;
 				} else {
-					$scope.players[i].turn = false;
+					vm.players[i].turn = false;
+				}
+			}
+		};
+
+        function newMatchCB(players, playerToPlay) {
+			//Updating player list
+			for (let i in vm.players) {
+				vm.players[i].lives = players[i].lives;
+				vm.players[i].won = 0;
+				vm.players[i].card = '';
+				vm.players[i].bet = '-';
+
+				if (vm.players[i].name == playerToPlay) {
+					vm.players[i].turn = true;
+				} else {
+					vm.players[i].turn = false;
 				}
 			}
 
 			//Updating cards
-			socket.emit('request-cards', null, function(data){
-				$scope.cards = data.cards;
-				$scope.matchNumber = $scope.cards.length;
+			socket.emit('request-cards', null, function(data) {
+				vm.cards = data.cards;
+				vm.matchNumber = vm.cards.length;
 
-				$scope.betOptions.length = 0;
-				for(var i = 0; i < $scope.matchNumber; i++){
-					$scope.betOptions.push(i);
+				vm.betOptions.length = 0;
+				for (var i = 0; i < vm.matchNumber; i++) {
+					vm.betOptions.push(i);
 				}
-				$scope.betOptions.push($scope.matchNumber);
+				vm.betOptions.push(vm.matchNumber);
 			});
 
 			//Update phase and playerturn
-			$scope.phase = "bet";
-		});
+			vm.phase = "bet";
+		};
 
-		socket.on('end-game', function (players) {
+		function endGameCB(players) {
 			//TODO better end game
 
 			//Updating player list
-			for (let i in $scope.players) {
-				$scope.players[i].lives = players[i].lives;
-				$scope.players[i].won = 0;
-				$scope.players[i].card = '';
-				$scope.players[i].bet = '-';
-				$scope.players[i].ready = false;
+			for (let i in vm.players) {
+				vm.players[i].lives = players[i].lives;
+				vm.players[i].won = 0;
+				vm.players[i].card = '';
+				vm.players[i].bet = '-';
+				vm.players[i].ready = false;
 			}
 
 			//Ending game
-			$scope.game = false;
-			$scope.phase = false;
-			$scope.readyToStart = false;
-		});
+			vm.isUp = false;
+			vm.phase = false;
+			vm.readyToStart = false;
+		};
 	};
 })();

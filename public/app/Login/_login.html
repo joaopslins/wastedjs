@@ -16,11 +16,11 @@
                                     <h4>Nick:</h4>
                                 </div>
                                 <div class="col-xs-9">
-                                    <input class="form-control" ng-model="name" type="text"  ng-keydown="$event.keyCode == 13 ? loginToggle() : null">
+                                    <input class="form-control" ng-model="login.name" type="text"  ng-keydown="$event.keyCode == 13 ? login.loginToggle() : null">
                                 </div>
                             </div>
                             <br />
-                            <button type="button" class="btn btn-lg btn-default center-block" ng-click="loginToggle()">
+                            <button type="button" class="btn btn-lg btn-default center-block" ng-click="login.loginToggle()">
                                 Login
                             </button>
                         </div>
@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Login Alert Box -->
-                <div class="alert alert-danger" style="text-align:center" ng-show="loginError" ng-bind-html="loginErrorMessage">
+                <div class="alert alert-danger" style="text-align:center" ng-show="login.loginError" ng-bind-html="login.loginErrorMessage">
                 </div>
 
             </div>
