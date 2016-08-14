@@ -10,6 +10,7 @@ var Card = require ('./game/card');
 var Deck = require ('./game/deck');
 var Player = require ('./game/player');
 var Game = require ('./game/game');
+var Lobby = require ('./game/lobby');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -24,9 +25,8 @@ server.listen(app.get('port'), function () {
 });
 
 //Server Variables
-var players = [];
-var game = null;
 var callInterval = 3000; //in ms
+var lobby = new Lobby();
 
 //Server connection code
 io.on('connection', function (socket)
@@ -47,18 +47,7 @@ io.on('connection', function (socket)
     function loginCB(name, callback) {
         console.log(name + " login");
 
-        let success = 0;
-
-        if (!isNameAvailable(name)) {
-            //If name not available
-            success = 1;
-        } else if(players.length == 5) {
-            //If game is full
-            success = 2;
-        } else if (game != null) {
-            //If game is on
-            success = 3;
-        }
+        let success = lobby.checkLogin(name);
 
         //Return playerlist and success to requested player
         callback(success);
@@ -66,8 +55,7 @@ io.on('connection', function (socket)
         if (success == 0) {
             //Add new player to server player list and socket
     		socket.name = name;
-    		let newPlayer = new Player (name);
-            players.push(newPlayer);
+            let newPlayer = lobby.addPlayer(name);
 
             //Update new player to other clients
             socket.broadcast.emit('player-connect',convertPlayer(newPlayer));
@@ -77,31 +65,26 @@ io.on('connection', function (socket)
     function readyCB(client) {
         console.log(client.name + " ready is " + client.ready);
 		//Update player in server player list
-		for (let i in players) {
-			if (players[i].name == client.name) {
-				players[i].ready = client.ready;
-				socket.broadcast.emit('update-client-ready', client);
-				//Probably unnecessary
-				break;
-			}
-		}
+	    lobby.setReady(client);
+        socket.broadcast.emit('update-client-ready', client);
 	};
 
     function playerBetCB(bet) {
         console.log(socket.name + " betted " + bet);
-        game.playerBet(socket.name, bet);
-        let startPlayPhase = game.phase == "play";
+        lobby.game.playerBet(socket.name, bet);
+        let startPlayPhase = lobby.game.phase == "play";
 
         io.emit('bet-update', {
             "bet": bet,
             "playerWhoBet": socket.name,
-            "nextPlayer": game.roundPlayer,
+            "nextPlayer": lobby.game.roundPlayer,
             "startPlayPhase": startPlayPhase
         });
     };
 
     function playerPlayCB(card) {
         console.log(socket.name + " player card " + card);
+        let game = lobby.game;
         game.playerPlayCard(socket.name, card);
 
         if (game.phase == 'end') {
@@ -128,6 +111,7 @@ io.on('connection', function (socket)
                     if (game.phase == "endgame") {
                         console.log("game over");
                         setTimeout(function() {
+                            lobby.game = null;
                             io.emit('end-game', createClientPlayerList(game.players));
                         }, callInterval);
                     } else if (game.phase == "bet"){
@@ -161,14 +145,17 @@ io.on('connection', function (socket)
 
     function startGameCB() {
         console.log("game started!");
-        game = new Game (players);
-        io.emit('game-start-notification', game.startMatchPlayer);
+        lobby.startGame();
+        io.emit('game-start-notification', {
+            "startingPlayer": lobby.game.startMatchPlayer,
+            "playerList" : createClientPlayerList(lobby.game.players)
+        });
     };
 
     function requestCardsCB(data, callback) {
         console.log(socket.name + " asked his cards");
         callback({
-            'cards' : game.getCardsFromPlayer(socket.name)
+            'cards' : lobby.game.getCardsFromPlayer(socket.name)
         });
     };
 
@@ -176,41 +163,15 @@ io.on('connection', function (socket)
         console.log(socket.name + " asked for playerlist");
         callback({
             'name' : socket.name,
-            'playerList' : createClientPlayerList(players),
+            'playerList' : createClientPlayerList(lobby.players),
         })
     };
 
     function disconnectCB() {
         console.log(socket.name + " disconnected");
-    	let name = socket.name;
+        lobby.disconnect(socket.name);
 
-        //If undefined, dont close game;
-        if (name == null) {
-            return;
-        }
-
-        //Remove player from server playlist
-        players = players.filter(function (player) {
-            return player.name != name;
-        });
-
-        //Undo game
-        if (game !== null) {
-            game = null;
-
-            //Reset players
-            for (let i in players) {
-                var player = players[i];
-
-                player.ready = false;
-                player.lives = 3;
-                player.won = 0;
-                player.bet = 0;
-            }
-        }
-
-        //Update removed player to other clients
-        socket.broadcast.emit('player-disconnect', name);
+        socket.broadcast.emit('player-disconnect', socket.name);
     };
 
     /////////////////////////////
@@ -240,15 +201,4 @@ io.on('connection', function (socket)
 
         return clientPlayerList;
     };
-
-    function isNameAvailable(name) {
-        for (var i in players) {
-            if (players[i].name == name) {
-                return false;
-            }
-        }
-
-        return true;
-    };
-
 });

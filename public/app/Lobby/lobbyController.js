@@ -38,7 +38,7 @@
                 vm.name = data.name;
                 vm.players = data.playerList;
 
-                if (vm.players.length == 1) {
+                if (vm.players[0].name == data.name) {
                     vm.firstPlayer = true;
                 }
             });
@@ -97,8 +97,8 @@
             updatePlayerModel();
 		};
 
-		function gameStartNotificationCB(startingPlayer) {
-            lobbyService.startGame(startingPlayer);
+		function gameStartNotificationCB(data) {
+            lobbyService.startGame(data);
 
 			$location.url("/game");
 		};

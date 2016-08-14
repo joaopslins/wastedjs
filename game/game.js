@@ -67,12 +67,13 @@ Game.prototype.getCardsFromPlayer = function(playerName){
 Game.prototype.setNextPlayer = function(isNextMatch){
     let found = false;
     let startIndex = null;
+    let index = null;
 
     while (!found) {
         if (isNextMatch) {
-            let index = this.getPlayerIndex(this.startMatchPlayer);
+            index = this.getPlayerIndex(this.startMatchPlayer);
         } else {
-            let index = this.getPlayerIndex(this.roundPlayer);
+            index = this.getPlayerIndex(this.roundPlayer);
         }
 
         //Get first index
@@ -104,13 +105,13 @@ Game.prototype.setNextPlayer = function(isNextMatch){
     }
 };
 
-Game.prototype.playerBet = function(name, bet){
+Game.prototype.playerBet = function(name, bet) {
     this.players[this.getPlayerIndex(name)].bet = bet;
 
     this.setNextPlayer(false);
 
     //End bet phase
-    if(this.roundPlayer == this.startRoundPlayer){
+    if (this.roundPlayer == this.startRoundPlayer) {
         this.phase = "play";
         this.roundNumber = this.matchNumber;
 
@@ -120,7 +121,7 @@ Game.prototype.playerBet = function(name, bet){
     }
 };
 
-Game.prototype.playerPlayCard = function (name, cardStr) {
+Game.prototype.playerPlayCard = function(name, cardStr) {
     let cards = this.players[this.getPlayerIndex(name)].hand;
     let card = cards.getCard (cardStr);
 

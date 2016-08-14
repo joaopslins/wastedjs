@@ -111,9 +111,11 @@
             return myName;
         }
 
-        function startGame(startingPlayer) {
+        function startGame(data) {
+			players = data.playerList;
+
 			for (let i in players) {
-				if (players[i].name == startingPlayer) {
+				if (players[i].name == data.startingPlayer) {
 					players[i].turn = true;
 				} else {
 					players[i].turn = false;
