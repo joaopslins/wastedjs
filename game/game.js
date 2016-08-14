@@ -36,6 +36,7 @@ Game.prototype.startMatch = function(){
 
         player.won = 0;
         player.bet = '-';
+        player.card = '';
     }
 
     //Distribute cards
@@ -181,11 +182,12 @@ Game.prototype.roundEnd = function() {
 Game.prototype.matchEnd = function() {
     var playersAlive = 0;
 
-    //Reduce lives
+    //Reduce lives and reset settings
     for (var i in this.players) {
         this.players[i].loseLives();
         this.players[i].won = 0;
         this.players[i].bet = '-';
+        this.card = '';
 
         if (this.players[i].isAlive) {
             playersAlive++;

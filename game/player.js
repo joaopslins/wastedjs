@@ -8,6 +8,7 @@ var Player = function (name) {
     this.lives = 3;
     this.won = 0;
     this.bet = '-';
+    this.card = '';
     this.isAlive = true;
 
     this.hand = new Deck();

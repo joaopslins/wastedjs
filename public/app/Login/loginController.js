@@ -5,7 +5,7 @@
         .module("wastedJSapp")
         .controller("loginController", loginCtrl);
 
-    function loginCtrl ($timeout, $location, socket) {
+    function loginCtrl ($location, socket) {
         var vm = this;
 
         //Local variables
@@ -39,23 +39,20 @@
             socket.emit('login', vm.name, function(success) {
                 if (success == 0) {
                     //Redirect view
-                    $location.url("/game");
+                    $location.url("/lobby");
                 } else {
-                	$timeout( function() {
-                		//Nick taken
-                		if (success == 1) {
-                			vm.loginErrorMessage =  '<strong>Cannot login!</strong>'+
-                										'<br />Nick was already taken!'
-                		} else if(success == 2) {
-                			vm.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
-                										'<br />Room is full!'
-                		} else if(success == 3)	{
-                			vm.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
-                										'<br />Room in game!'
-                		}
+            		if (success == 1) {
+            			vm.loginErrorMessage =  '<strong>Cannot login!</strong>'+
+            										'<br />Nick was already taken!'
+            		} else if(success == 2) {
+            			vm.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+            										'<br />Room is full!'
+            		} else if(success == 3)	{
+            			vm.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+            										'<br />Room in game!'
+            		}
 
-                		vm.loginError = true;
-                	}, 550);
+            		vm.loginError = true;
                 }
             });
     	};

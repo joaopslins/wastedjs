@@ -8,11 +8,11 @@
 		var socket = null;
 
 		var socketService = {
-			connect: connect,
-			disconnect: disconnect,
-			isConnected: isConnected,
-			on: on,
-			emit: emit
+			"connect": connect,
+			"disconnect": disconnect,
+			"isConnected": isConnected,
+			"on": on,
+			"emit": emit
 		};
 
 		return socketService;

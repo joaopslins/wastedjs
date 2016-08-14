@@ -3,7 +3,7 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require ('socket.io') (server);
 
-// External Files
+// External game files
 var Card = require ('./game/card');
 var Deck = require ('./game/deck');
 var Player = require ('./game/player');
@@ -75,17 +75,16 @@ var disconnect_C = function(socket){
     }
 
     //Remove player from server playlist
-    players = players.filter(function (player)
-    {
+    players = players.filter(function (player) {
         return player.name != name;
     });
 
     //Undo game
-    if(game !== null){
+    if (game !== null) {
         game = null;
 
         //Reset players
-        for(var i in players){
+        for (var i in players) {
             var player = players[i];
 
             player.ready = false;
@@ -105,18 +104,17 @@ var disconnect_C = function(socket){
 //Server connection code
 io.on('connection', function (socket)
 {
-	socket.on('login', function (name, callback)
-	{
+	socket.on('login', function (name, callback) {
         console.log(name + " login");
 
         var success = 0;
 
         //If name not available
-        if(!isNameAvailable(name)){
+        if (!isNameAvailable(name)) {
             success = 1;
         }
         //If game is full
-        else if(players.length == 5){
+        else if(players.length == 5) {
             success = 2;
         }
         //If game is on
@@ -139,8 +137,7 @@ io.on('connection', function (socket)
 	});
 
     // Client = {name,ready}
-	socket.on('ready', function(client)
-	{
+	socket.on('ready', function(client) {
         console.log(client.name + " ready is " + client.ready);
 		//Update player in server player list
 		for(var i in players)
@@ -156,12 +153,17 @@ io.on('connection', function (socket)
 	});
 
     //Player has done a bet
-    socket.on('player-bet', function(bet){
+    socket.on('player-bet', function(bet) {
         console.log(socket.name + " betted " + bet);
         game.playerBet(socket.name, bet);
         var startPlayPhase = game.phase == "play";
 
-        io.emit('bet-update', bet, socket.name, game.roundPlayer, startPlayPhase);
+        io.emit('bet-update', {
+            "bet": bet,
+            "playerWhoBet": socket.name,
+            "nextPlayer": game.roundPlayer,
+            "startPlayPhase": startPlayPhase
+        });
     });
 
     //Player played a card
@@ -172,12 +174,19 @@ io.on('connection', function (socket)
         if (game.phase == 'end') {
             console.log("round over");
             //Round is over
-            io.emit('play-update', card, socket.name, '');
+            io.emit('play-update', {
+                "card": card,
+                "playerWhoPlayed": socket.name,
+                "nextPlayer": ''
+            });
             game.roundEnd();
 
             if (game.phase == "endmatch") {
                 setTimeout(function(){
-                    io.emit('new-round', createClientPlayerList(game.players), '');
+                    io.emit('new-round', {
+                        "players": createClientPlayerList(game.players),
+                        "playerToPlay": ''
+                    });
 
                     //Match is over
                     console.log("match over");
@@ -185,37 +194,47 @@ io.on('connection', function (socket)
 
                     if (game.phase == "endgame") {
                         console.log("game over");
-                        setTimeout(function(){
+                        setTimeout(function() {
                             io.emit('end-game', createClientPlayerList(game.players));
                         }, callInterval);
                     } else if (game.phase == "bet"){
-                        setTimeout(function(){
-                            io.emit('new-match', createClientPlayerList(game.players), game.startMatchPlayer);
+                        setTimeout(function() {
+                            io.emit('new-match', {
+                                "players": createClientPlayerList(game.players),
+                                "playerToPlay": game.startMatchPlayer
+                            });
                         }, callInterval);
                     }
                 }, callInterval);
 
             } else {
                 //Match is not over
-                setTimeout(function(){
-                    io.emit('new-round', createClientPlayerList(game.players), game.roundPlayer);
+                setTimeout(function() {
+                    io.emit('new-round', {
+                        "players": createClientPlayerList(game.players),
+                        "playerToPlay": game.roundPlayer
+                    });
                 }, callInterval);
             }
         } else if (game.phase == 'play') {
             //Continue playing the same round
-            io.emit('play-update', card, socket.name, game.roundPlayer);
+            io.emit('play-update', {
+                "card": card,
+                "playerWhoPlayed": socket.name,
+                "nextPlayer": game.roundPlayer
+            });
         }
     });
 
     //Host client started game
-    socket.on('start-game', function(){
+    socket.on('start-game', function() {
         console.log("game started!");
         game = new Game (players);
         io.emit('game-start-notification', game.startMatchPlayer);
     });
 
     //Client requested his cards
-    socket.on('request-cards', function(data, callback){
+    socket.on('request-cards', function(data, callback) {
         console.log(socket.name + " asked his cards");
         callback({
             'cards' : game.getCardsFromPlayer(socket.name)
@@ -230,7 +249,7 @@ io.on('connection', function (socket)
         })
     });
 
-	socket.on('disconnect', function(){
+	socket.on('disconnect', function() {
         console.log(socket.name + " disconnected");
         disconnect_C(socket);
     });
