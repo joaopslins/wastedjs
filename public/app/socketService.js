@@ -1,5 +1,7 @@
 // From http://briantford.com/blog/angular-socket-io
 (function() {
+	'use strict';
+
 	angular
         .module("wastedJSapp")
 		.factory("socket", socket);

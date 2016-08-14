@@ -1,3 +1,5 @@
+'use strict';
+
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
@@ -107,7 +109,7 @@ io.on('connection', function (socket)
 	socket.on('login', function (name, callback) {
         console.log(name + " login");
 
-        var success = 0;
+        let success = 0;
 
         //If name not available
         if (!isNameAvailable(name)) {
@@ -128,7 +130,7 @@ io.on('connection', function (socket)
         if (success == 0) {
             //Add new player to server player list and socket
     		socket.name = name;
-    		var newPlayer = new Player (name);
+    		let newPlayer = new Player (name);
             players.push(newPlayer);
 
             //Update new player to other clients
@@ -140,7 +142,7 @@ io.on('connection', function (socket)
 	socket.on('ready', function(client) {
         console.log(client.name + " ready is " + client.ready);
 		//Update player in server player list
-		for(var i in players)
+		for(let i in players)
 		{
 			if (players[i].name == client.name)
 			{
@@ -156,7 +158,7 @@ io.on('connection', function (socket)
     socket.on('player-bet', function(bet) {
         console.log(socket.name + " betted " + bet);
         game.playerBet(socket.name, bet);
-        var startPlayPhase = game.phase == "play";
+        let startPlayPhase = game.phase == "play";
 
         io.emit('bet-update', {
             "bet": bet,

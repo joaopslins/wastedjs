@@ -27,7 +27,7 @@ Player.prototype.toString = function() {
 };
 
 Player.prototype.loseLives = function() {
-    var lostLives = Math.abs(this.won - this.bet);
+    let lostLives = Math.abs(this.won - this.bet);
 
     this.lives -= lostLives;
 

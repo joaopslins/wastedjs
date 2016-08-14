@@ -1,4 +1,6 @@
 (function() {
+	'use strict';
+
     angular
     	.module("wastedJSapp")
 		.controller("lobbyController", lobbyCtrl);
