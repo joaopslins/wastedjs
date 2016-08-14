@@ -1,1 +1,3 @@
-var wastedJS = angular.module ("wastedJSapp", ["ngRoute","ngAnimate", "ngSanitize"]);
+(function() {
+    angular.module ("wastedJSapp", ["ngRoute","ngAnimate", "ngSanitize"]);
+})();

@@ -1,47 +1,65 @@
-wastedJS.controller("loginController", function($scope, $timeout, $location, socket)
-{
-	//Local variables
-    $scope.name = '';
-    $scope.loginError = false;
-    $scope.loginErrorMessage = '';
+(function() {
+    'use strict';
 
-    if (socket.isConnected()) {
-        socket.disconnect();
-    }
+    angular
+        .module("wastedJSapp")
+        .controller("loginController", loginCtrl);
 
-	//login button function
-	$scope.loginToggle = function()
-	{
-		//Reset error status
-		$scope.loginError = false;
+    function loginCtrl ($location, socket) {
+        var vm = this;
+        var inProcess = false;
 
-        //Don't login with null name
-    	if($scope.name == "") return;
+        //Local variables
+        vm.name = '';
+        vm.loginError = false;
+        vm.loginErrorMessage = '';
 
-        //Tries to login into server
-        socket.connect();
-        socket.emit('login', $scope.name, function(success)
-        {
-            if(success == 0) {
-                //Redirect view
-                $location.url("/game");
-            } else {
-            	$timeout( function() {
-            		//Nick taken
+        //Function Binds
+        vm.loginToggle = loginToggle;
+
+        activate();
+
+        //////////////////////////////
+
+        function activate() {
+            if (socket.isConnected()) {
+                socket.disconnect();
+            }
+        };
+
+    	//login button function
+    	function loginToggle() {
+    		//Reset error status
+    		vm.loginError = false;
+
+            //Don't login with null name
+        	if(vm.name == "") return;
+            if (inProcess) return;
+            inProcess = true;
+
+            //Tries to login into server
+            socket.connect();
+            socket.emit('login', vm.name, function(success) {
+                if (success == 0) {
+                    //Redirect view
+                    $location.url("/lobby");
+                } else {
             		if (success == 1) {
-            			$scope.loginErrorMessage =  '<strong>Cannot login!</strong>'+
+            			vm.loginErrorMessage =  '<strong>Cannot login!</strong>'+
             										'<br />Nick was already taken!'
             		} else if(success == 2) {
-            			$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+            			vm.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
             										'<br />Room is full!'
             		} else if(success == 3)	{
-            			$scope.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
+            			vm.loginErrorMessage = 	'<strong>Cannot login!</strong>'+
             										'<br />Room in game!'
             		}
 
-            		$scope.loginError = true;
-            	}, 550);
-            }
-        });
-	}
-});
+            		vm.loginError = true;
+                }
+
+                inProcess = false;
+            });
+    	};
+    };
+})();

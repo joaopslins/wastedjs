@@ -15,7 +15,7 @@ var Game = function(players) {
 
     this.playersQty = players.length;
 
-    for (var i in this.players) {
+    for (let i in this.players) {
         this.players[i].lives = 3;
         this.players[i].isAlive = true;
     }
@@ -31,15 +31,16 @@ Game.prototype.startMatch = function(){
     this.isTied = false;
 
     //Reset Players
-    for(var i in this.players){
+    for(let i in this.players){
         var player = this.players[i];
 
         player.won = 0;
         player.bet = '-';
+        player.card = '';
     }
 
     //Distribute cards
-    var deck = new Deck();
+    let deck = new Deck();
     deck.shuffle();
     deck.distribute(this.players, this.matchNumber);
 
@@ -47,7 +48,7 @@ Game.prototype.startMatch = function(){
 };
 
 Game.prototype.getPlayerIndex = function(playerName){
-    for(var i in this.players){
+    for (let i in this.players) {
         if(this.players[i].name == playerName){
             return i;
         }
@@ -58,20 +59,21 @@ Game.prototype.getPlayerIndex = function(playerName){
 };
 
 Game.prototype.getCardsFromPlayer = function(playerName){
-    var player = this.players[this.getPlayerIndex(playerName)];
+    let player = this.players[this.getPlayerIndex(playerName)];
 
     return player.hand.getCards();
 };
 
 Game.prototype.setNextPlayer = function(isNextMatch){
-    var found = false;
-    var startIndex = null;
+    let found = false;
+    let startIndex = null;
+    let index = null;
 
     while (!found) {
         if (isNextMatch) {
-            var index = this.getPlayerIndex(this.startMatchPlayer);
+            index = this.getPlayerIndex(this.startMatchPlayer);
         } else {
-            var index = this.getPlayerIndex(this.roundPlayer);
+            index = this.getPlayerIndex(this.roundPlayer);
         }
 
         //Get first index
@@ -103,13 +105,13 @@ Game.prototype.setNextPlayer = function(isNextMatch){
     }
 };
 
-Game.prototype.playerBet = function(name, bet){
+Game.prototype.playerBet = function(name, bet) {
     this.players[this.getPlayerIndex(name)].bet = bet;
 
     this.setNextPlayer(false);
 
     //End bet phase
-    if(this.roundPlayer == this.startRoundPlayer){
+    if (this.roundPlayer == this.startRoundPlayer) {
         this.phase = "play";
         this.roundNumber = this.matchNumber;
 
@@ -119,9 +121,9 @@ Game.prototype.playerBet = function(name, bet){
     }
 };
 
-Game.prototype.playerPlayCard = function (name, card) {
-    var cards = this.players[this.getPlayerIndex(name)].hand;
-    var card = cards.getCard (card);
+Game.prototype.playerPlayCard = function(name, cardStr) {
+    let cards = this.players[this.getPlayerIndex(name)].hand;
+    let card = cards.getCard (cardStr);
 
     //Updates winner card when someone plays
     if (this.winCard == null) {
@@ -179,13 +181,14 @@ Game.prototype.roundEnd = function() {
 };
 
 Game.prototype.matchEnd = function() {
-    var playersAlive = 0;
+    let playersAlive = 0;
 
-    //Reduce lives
-    for (var i in this.players) {
+    //Reduce lives and reset settings
+    for (let i in this.players) {
         this.players[i].loseLives();
         this.players[i].won = 0;
         this.players[i].bet = '-';
+        this.card = '';
 
         if (this.players[i].isAlive) {
             playersAlive++;
