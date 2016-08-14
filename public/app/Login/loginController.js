@@ -7,6 +7,7 @@
 
     function loginCtrl ($location, socket) {
         var vm = this;
+        var inProcess = false;
 
         //Local variables
         vm.name = '';
@@ -33,6 +34,8 @@
 
             //Don't login with null name
         	if(vm.name == "") return;
+            if (inProcess) return;
+            inProcess = true;
 
             //Tries to login into server
             socket.connect();
@@ -54,6 +57,8 @@
 
             		vm.loginError = true;
                 }
+
+                inProcess = false;
             });
     	};
     };
