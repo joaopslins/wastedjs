@@ -75,10 +75,10 @@ io.on('connection', function (socket)
         let startPlayPhase = lobby.game.phase == "play";
 
         io.emit('bet-update', {
-            "bet": bet,
-            "playerWhoBet": socket.name,
-            "nextPlayer": lobby.game.roundPlayer,
-            "startPlayPhase": startPlayPhase
+            bet: bet,
+            playerWhoBet: socket.name,
+            nextPlayer: lobby.game.roundPlayer,
+            startPlayPhase: startPlayPhase
         });
     };
 
@@ -91,17 +91,17 @@ io.on('connection', function (socket)
             console.log("round over");
             //Round is over
             io.emit('play-update', {
-                "card": card,
-                "playerWhoPlayed": socket.name,
-                "nextPlayer": ''
+                card: card,
+                playerWhoPlayed: socket.name,
+                nextPlayer: ''
             });
             game.roundEnd();
 
             if (game.phase == "endmatch") {
                 setTimeout(function(){
                     io.emit('new-round', {
-                        "players": createClientPlayerList(game.players),
-                        "playerToPlay": ''
+                        players: createClientPlayerList(game.players),
+                        playerToPlay: ''
                     });
 
                     //Match is over
@@ -117,8 +117,8 @@ io.on('connection', function (socket)
                     } else if (game.phase == "bet"){
                         setTimeout(function() {
                             io.emit('new-match', {
-                                "players": createClientPlayerList(game.players),
-                                "playerToPlay": game.startMatchPlayer
+                                players: createClientPlayerList(game.players),
+                                playerToPlay: game.startMatchPlayer
                             });
                         }, callInterval);
                     }
@@ -128,17 +128,17 @@ io.on('connection', function (socket)
                 //Match is not over
                 setTimeout(function() {
                     io.emit('new-round', {
-                        "players": createClientPlayerList(game.players),
-                        "playerToPlay": game.roundPlayer
+                        players: createClientPlayerList(game.players),
+                        playerToPlay: game.roundPlayer
                     });
                 }, callInterval);
             }
         } else if (game.phase == 'play') {
             //Continue playing the same round
             io.emit('play-update', {
-                "card": card,
-                "playerWhoPlayed": socket.name,
-                "nextPlayer": game.roundPlayer
+                card: card,
+                playerWhoPlayed: socket.name,
+                nextPlayer: game.roundPlayer
             });
         }
     };
@@ -147,23 +147,23 @@ io.on('connection', function (socket)
         console.log("game started!");
         lobby.startGame();
         io.emit('game-start-notification', {
-            "startingPlayer": lobby.game.startMatchPlayer,
-            "playerList" : createClientPlayerList(lobby.game.players)
+            startingPlayer: lobby.game.startMatchPlayer,
+            playerList : createClientPlayerList(lobby.game.players)
         });
     };
 
     function requestCardsCB(data, callback) {
         console.log(socket.name + " asked his cards");
         callback({
-            'cards' : lobby.game.getCardsFromPlayer(socket.name)
+            cards : lobby.game.getCardsFromPlayer(socket.name)
         });
     };
 
     function requestPlayerlistCB(data, callback) {
         console.log(socket.name + " asked for playerlist");
         callback({
-            'name' : socket.name,
-            'playerList' : createClientPlayerList(lobby.players),
+            name : socket.name,
+            playerList : createClientPlayerList(lobby.players),
         })
     };
 

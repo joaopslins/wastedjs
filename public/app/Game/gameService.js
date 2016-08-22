@@ -11,17 +11,17 @@
         var matchNumber = 0;
 
 		var game = {
-            "updateData": updateData,
-            "generateBetOptions": generateBetOptions,
-            "updateBetOptions": updateBetOptions,
-            "betTurn": betTurn,
-            "cardTurn": cardTurn,
-            "newRoundUpdate": newRoundUpdate,
-            "newMatchUpdate": newMatchUpdate,
-            "setMatchNumber": setMatchNumber,
-            "getMatchNumber": getMatchNumber,
-            "getPlayerlist": getPlayerlist,
-            "getMe": getMe
+            updateData: updateData,
+            generateBetOptions: generateBetOptions,
+            updateBetOptions: updateBetOptions,
+            betTurn: betTurn,
+            cardTurn: cardTurn,
+            newRoundUpdate: newRoundUpdate,
+            newMatchUpdate: newMatchUpdate,
+            setMatchNumber: setMatchNumber,
+            getMatchNumber: getMatchNumber,
+            getPlayerlist: getPlayerlist,
+            getMe: getMe
 		};
 
 		return game;

@@ -10,15 +10,15 @@
         var myName = '';
 
 		var lobby = {
-			"getPlayers": getPlayers,
-            "setPlayers": setPlayers,
-            "toggleReady": toggleReady,
-            "addPlayer": addPlayer,
-            "removePlayer": removePlayer,
-            "updateReadyForPlayer": updateReadyForPlayer,
-            "getReady": getReady,
-            "getMyName": getMyName,
-            "startGame": startGame
+			getPlayers: getPlayers,
+            setPlayers: setPlayers,
+            toggleReady: toggleReady,
+            addPlayer: addPlayer,
+            removePlayer: removePlayer,
+            updateReadyForPlayer: updateReadyForPlayer,
+            getReady: getReady,
+            getMyName: getMyName,
+            startGame: startGame
 		};
 
 		return lobby;
