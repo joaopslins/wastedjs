@@ -123,6 +123,11 @@
 	font-weight: bold;
 }
 
+.defeated-player {
+	color: #FAFAFA;
+	background-color: #FAFAFA;
+}
+
 /* =============== ANIMATIONS ================ */
 
 .login-animate {

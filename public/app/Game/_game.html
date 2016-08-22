@@ -10,7 +10,7 @@
                     </div>
 
                     <div class="panel-body">
-
+                    
                         <!-- Player Scoreboard -->
                         <div class="panel panel-default fjs-game-main">
                             <table class="table table-bordered fjs-game-table">
@@ -19,7 +19,7 @@
                                     <td> Lives </td>
                                     <td> Won/Bet </td>
                                 </tr>
-                                <tr ng-repeat="player in game.players">
+                                <tr ng-repeat="player in game.players" ng-class = "{'defeated-player': player.lives < 1}">
                                     <td>{{player.name}}</td>
                                     <td> <span ng-repeat="i in player.lives | livesCount" class="hearts-lives">
                                         &hearts;
