@@ -93,7 +93,8 @@ io.on('connection', function (socket)
             io.emit('play-update', {
                 card: card,
                 playerWhoPlayed: socket.name,
-                nextPlayer: ''
+                nextPlayer: '',
+                wonPlayer: game.winPlayer
             });
             game.roundEnd();
 

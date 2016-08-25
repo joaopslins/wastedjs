@@ -35,7 +35,7 @@
                                 <tr class="table-header">
                                     <td
                                     ng-repeat = "player in game.players"
-                                    ng-class = "{'selected-player' : player.turn}">{{player.name}}</td>
+                                    ng-class = "{'selected-player' : player.turn, 'won-round-player' : player.wonRound}">{{player.name}}</td>
                                 </tr>
                                 <tr>
                                     <td
@@ -65,7 +65,7 @@
                                 class = "fjs-card fjs-hand"
                                 ng-repeat="card in game.cards"
                                 ng-bind-html = "card | cardFilter"
-                                ng-class="{'red-card' : cardIsRed(card), 'selected-card' : card == game.me.card}"
+                                ng-class="{'red-card' : game.cardIsRed(card), 'selected-card' : card == game.me.card}"
                                 ng-click = "game.cardSelect($index)" >
                                 </div>
                             </div>

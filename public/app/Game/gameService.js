@@ -113,6 +113,17 @@
 				}
 			}
 
+			//If it's last round, check who won to apply indicator
+			if (data.wonPlayer) {
+				for (let i in players) {
+					if (players[i].name == data.wonPlayer) {
+						players[i].wonRound = true;
+					} else {
+						players[i].wonRound = false;
+					}
+				}
+			}
+
             return players;
         };
 
@@ -120,6 +131,7 @@
 			for (let i in players) {
 				players[i].won = data.players[i].won;
 				players[i].card = '';
+				players[i].wonRound = false;
 
 				if (players[i].name == data.playerToPlay) {
 					players[i].turn = true;
