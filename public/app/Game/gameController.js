@@ -22,6 +22,7 @@
         vm.betClick = betClick;
         vm.cardIsRed = cardIsRed;
         vm.cardSelect = cardSelect;
+        vm.checkLostHearts = checkLostHearts;
 
         //Socket listener events
         socket.on('player-disconnect', playerDisconnectCB);
@@ -86,6 +87,12 @@
 			}
 		};
 
+		function checkLostHearts(i, playerName) {
+			if (vm.phase == "endmatch") {
+				return gameService.checkHeartFade(i, playerName);
+			}
+		};
+
         ///////////////////////////////
         // Socket listener callbacks //
         ///////////////////////////////
@@ -111,11 +118,15 @@
 
 		function playUpdateCB (data) {
 			//Update Card and turn locally
-            vm.players = gameService.cardTurn(data)
+            vm.players = gameService.cardTurn(data);
 		};
 
         function newRoundCB(data) {
             vm.players = gameService.newRoundUpdate(data);
+            if (!data.playerToPlay) {
+            	vm.phase = "endmatch";
+            	console.log("cabou partida");
+            }
 		};
 
         function newMatchCB(data) {

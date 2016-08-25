@@ -117,6 +117,10 @@
 	color: red;
 }
 
+.faded-heart {
+	color: black;
+}
+
 .selected-player {
 	background-color: #337ab7;
 	color: white;

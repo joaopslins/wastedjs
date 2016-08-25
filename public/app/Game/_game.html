@@ -21,7 +21,9 @@
                                 </tr>
                                 <tr ng-repeat="player in game.players" ng-class = "{'defeated-player': player.lives < 1}">
                                     <td>{{player.name}}</td>
-                                    <td> <span ng-repeat="i in player.lives | livesCount" class="hearts-lives">
+                                    <td> <span ng-repeat="i in player.lives | livesCount" 
+                                                class="hearts-lives"
+                                                ng-class="{'faded-heart': game.checkLostHearts(i, player.name)}">
                                         &hearts;
                                     </span> </td>
                                     <td>{{player.won}} / {{player.bet}}</td>
@@ -42,7 +44,7 @@
                                     class = "fjs-card"
                                     ng-repeat = "player in game.players"
                                     ng-bind-html = "player.card | cardFilter"
-                                    ng-class="cardIsRed(player.card) ? 'red-card' : '' ">
+                                    ng-class="game.cardIsRed(player.card) ? 'red-card' : '' ">
                                     </td>
                                 </tr>
                             </table>

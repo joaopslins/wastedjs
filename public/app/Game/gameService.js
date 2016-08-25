@@ -18,6 +18,7 @@
             cardTurn: cardTurn,
             newRoundUpdate: newRoundUpdate,
             newMatchUpdate: newMatchUpdate,
+            checkHeartFade: checkHeartFade,
             setMatchNumber: setMatchNumber,
             getMatchNumber: getMatchNumber,
             getPlayerlist: getPlayerlist,
@@ -157,6 +158,15 @@
 			}
 
             return players;
+        };
+
+        function checkHeartFade(heartNumber, playerName) {
+        	for (let i in players) {
+        		if (players[i].name == playerName) {
+        			let heartsLost = Math.abs(players[i].won - players[i].bet);
+        			return (heartNumber >= (players[i].lives - heartsLost));
+        		}
+        	}
         }
 
         function setMatchNumber(number) {
