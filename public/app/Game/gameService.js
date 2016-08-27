@@ -167,7 +167,7 @@
         			return (heartNumber >= (players[i].lives - heartsLost));
         		}
         	}
-        }
+        };
 
         function setMatchNumber(number) {
             matchNumber = number;

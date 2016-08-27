@@ -55,7 +55,7 @@
 						callback.apply(socket, args);
 					}
 				});
-			})
+			});
 		};
 	};
 })();

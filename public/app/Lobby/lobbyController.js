@@ -42,7 +42,7 @@
                     vm.firstPlayer = true;
                 }
             });
-        }
+        };
 
         //////////////////////////////
         // Function Implementations //
@@ -63,8 +63,8 @@
 
 			// Update to server
 			socket.emit('ready', {
-				"name": vm.name,
-				"ready": lobbyService.getReady()
+				name: vm.name,
+				ready: lobbyService.getReady()
 			});
 		};
 
@@ -88,7 +88,7 @@
 
 		function playerDisconnectCB(dcName) {
             vm.firstPlayer = lobbyService.removePlayer (dcName)
-			vm.readyToStart = false;
+			vm.readyToStart = lobbyService.isEveryoneReady();
             updatePlayerModel();
 		};
 
@@ -109,6 +109,6 @@
 
         function updatePlayerModel() {
             vm.players = lobbyService.getPlayers();
-        }
+        };
 	};
 })();

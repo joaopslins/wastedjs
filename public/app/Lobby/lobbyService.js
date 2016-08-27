@@ -16,6 +16,7 @@
             addPlayer: addPlayer,
             removePlayer: removePlayer,
             updateReadyForPlayer: updateReadyForPlayer,
+			isEveryoneReady: isEveryoneReady,
             getReady: getReady,
             getMyName: getMyName,
             startGame: startGame
@@ -58,7 +59,7 @@
 
         function addPlayer(player) {
             players.push(player);
-        }
+        };
 
         function removePlayer(playerName) {
             //Remove player
@@ -72,7 +73,7 @@
             } else {
                 return false;
             }
-        }
+        };
 
         function updateReadyForPlayer(player) {
 			let readyToStart = true;
@@ -95,7 +96,17 @@
         	}
 
             return readyToStart;
-        }
+        };
+
+		function isEveryoneReady() {
+			for (let i in players) {
+				if (!players[i].ready) {
+					return false;
+				}
+			}
+
+			return true;
+		};
 
         function getReady() {
             for (let i in players) {
@@ -109,7 +120,7 @@
 
         function getMyName() {
             return myName;
-        }
+        };
 
         function startGame(data) {
 			players = data.playerList;
@@ -121,6 +132,6 @@
 					players[i].turn = false;
 				}
 			}
-        }
+        };
 	};
 })();

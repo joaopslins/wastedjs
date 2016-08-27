@@ -48,7 +48,7 @@
 				vm.cards = data.cards;
 				vm.betOptions = gameService.generateBetOptions();
 			});
-        }
+        };
 
         //////////////////////////////
         // Function Implementations //
@@ -163,6 +163,6 @@
             } else {
                 return true;
             }
-        }
+        };
 	};
 })();

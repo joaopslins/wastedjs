@@ -4,7 +4,7 @@ var Card = require ("./card");
 
 var Deck = function () {
     this.cards = [];
-}
+};
 
 Deck.prototype.generate = function() {
     this.cards = [];

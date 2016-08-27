@@ -3,7 +3,7 @@
 var Card = function(rank, suit) {
     this.rank = rank;
     this.suit = suit;
-}
+};
 
 Card.prototype.value = function() {
     if(this.rank == 0 && this.suit == 2) { /* 4   of Clubs */
