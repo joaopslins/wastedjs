@@ -5,7 +5,7 @@
     	.module("wastedJSapp")
 		.controller("gameController", gameCtrl);
 
-	function gameCtrl($location, gameService, socket) {
+	function gameCtrl($location, $timeout, gameService, socket) {
         var vm = this;
 
 		//Local variables
@@ -125,7 +125,6 @@
             vm.players = gameService.newRoundUpdate(data);
             if (!data.playerToPlay) {
             	vm.phase = "endmatch";
-            	console.log("cabou partida");
             }
 		};
 
@@ -145,12 +144,13 @@
 		};
 
 		function endGameCB(players) {
-			//TODO better end game
+			//Highlight winners
+			gameService.messageWinner(players);
 
-            $location.url("/lobby");
-
-			//Ending game
-			vm.phase = false;
+			//Send to lobby after some time
+            $timeout(5000).then(function(){
+				$location.url("/lobby");
+			});
 		};
 
         /////////////////////////////

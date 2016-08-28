@@ -19,6 +19,7 @@
             newRoundUpdate: newRoundUpdate,
             newMatchUpdate: newMatchUpdate,
             checkHeartFade: checkHeartFade,
+            messageWinner: messageWinner,
             setMatchNumber: setMatchNumber,
             getMatchNumber: getMatchNumber,
             getPlayerlist: getPlayerlist,
@@ -167,6 +168,18 @@
         			return (heartNumber >= (players[i].lives - heartsLost));
         		}
         	}
+        };
+
+        function messageWinner(data) {
+            for (let i in players) {
+                players[i].lives = data[i].lives;
+
+                if (players[i].lives > 0) {
+                    players[i].wonRound = true;
+                    players[i].won = 0;
+                    players[i].bet = 0;
+                }
+            }
         };
 
         function setMatchNumber(number) {
