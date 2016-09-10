@@ -38,6 +38,7 @@ io.on('connection', function (socket)
     socket.on('start-game', startGameCB);
     socket.on('request-cards', requestCardsCB);
     socket.on('request-playerlist', requestPlayerlistCB);
+    socket.on('kick-player', kickPlayerCB);
 	socket.on('disconnect', disconnectCB);
 
     //////////////////////////////
@@ -168,11 +169,25 @@ io.on('connection', function (socket)
         })
     };
 
+    function kickPlayerCB(name) {
+        console.log(name + " was kicked by " + socket.name );
+
+        for(let i in io.sockets.connected) {
+            if (io.sockets.connected[i].name == name) {
+                io.sockets.connected[i].emit('kicked');
+                io.sockets.connected[i].disconnect();
+            }
+        }
+    };
+
     function disconnectCB() {
         console.log(socket.name + " disconnected");
-        lobby.disconnect(socket.name);
+        //if undefined, dont emit events
+        if (socket.name) {
+            lobby.disconnect(socket.name);
 
-        socket.broadcast.emit('player-disconnect', socket.name);
+            socket.broadcast.emit('player-disconnect', socket.name);
+        }
     };
 
     /////////////////////////////

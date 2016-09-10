@@ -20,12 +20,14 @@
         vm.logoutButton = logoutButton;
         vm.readyButton = readyButton;
         vm.startGame = startGame;
+		vm.kickPlayer = kickPlayer;
 
         //Socket listener events
 		socket.on('player-connect', playerConnectCB);
         socket.on('player-disconnect', playerDisconnectCB);
         socket.on('update-client-ready', updateClientReadyCB);
         socket.on('game-start-notification', gameStartNotificationCB);
+		socket.on('kicked', kickedCB);
 
         activate();
 
@@ -75,6 +77,11 @@
 			}
 		};
 
+		function kickPlayer(name) {
+			socket.emit('kick-player', name);
+			lobbyService.removePlayer(name);
+		};
+
         ///////////////////////////////
         // Socket listener callbacks //
         ///////////////////////////////
@@ -101,6 +108,10 @@
             lobbyService.startGame(data);
 
 			$location.url("/game");
+		};
+
+		function kickedCB(name) {
+			$location.url("/");
 		};
 
         /////////////////////////////

@@ -33,6 +33,9 @@
                     <div class="panel-body"  style = "text-align:center">
                         <div ng-repeat="player in lobby.players" class="player-animate not-ready"	ng-class="player.ready ? 'ready' : ' ' ">
                             {{player.name}}
+                            <span style="color: red; cursor: pointer" class="glyphicon glyphicon-remove"
+                                    ng-show="lobby.firstPlayer && player.name != lobby.name"
+                                    ng-click="lobby.kickPlayer(player.name)"/>
                         </div>
                     </div>
 
