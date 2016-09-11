@@ -56,6 +56,7 @@
             		}
 
             		vm.loginError = true;
+                    socket.disconnect();
                 }
 
                 inProcess = false;

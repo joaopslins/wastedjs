@@ -72,6 +72,8 @@ io.on('connection', function (socket)
 
             //Update new player to other clients
             socket.broadcast.emit('player-connect', newPlayer);
+        } else {
+            console.log(name + " login denied");
         }
 	};
 
