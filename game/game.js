@@ -30,6 +30,11 @@ Game.prototype.startMatch = function(){
     this.winPlayer = '';
     this.isTied = false;
 
+    //Distribute cards
+    let deck = new Deck();
+    deck.shuffle();
+    deck.distribute(this.players, this.matchNumber);
+
     //Reset Players
     for(let i in this.players){
         var player = this.players[i];
@@ -37,12 +42,8 @@ Game.prototype.startMatch = function(){
         player.won = 0;
         player.bet = '-';
         player.card = '';
+        player.hand.sort();
     }
-
-    //Distribute cards
-    let deck = new Deck();
-    deck.shuffle();
-    deck.distribute(this.players, this.matchNumber);
 
     this.phase = "bet";
 };

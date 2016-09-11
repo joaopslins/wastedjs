@@ -16,6 +16,8 @@
 		vm.players = [];
 		vm.cards = [];
 		vm.betOptions = [];
+		vm.manilhas = ["4C","7H","AS","7D"];
+		vm.weakCards = ["3S","2H","AD","KS","JH","QS","7C","6H","5D","4S"];
 
         //Function Binds
         vm.playCard = playCard;

@@ -40,6 +40,11 @@
     cursor: pointer;
 }
 
+.fjs-help-card{
+	font-size: 400%;
+	cursor: default;
+}
+
 .fjs-hand{
 	display: inline-block;
 }

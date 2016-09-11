@@ -206,20 +206,6 @@ io.on('connection', function (socket)
     //    Utility Functions    //
     /////////////////////////////
 
-    function convertPlayer(player) {
-        var clientPlayer = {
-            name: player.name,
-            ready:  player.ready,
-            lives: player.lives,
-            won: player.won,
-            bet: player.bet,
-            isAlive: player.isAlive,
-            card: ''
-        };
-
-        return clientPlayer;
-    };
-
     function createClientPlayerList(playerL) {
         var clientPlayerList = playerL.map(
             (player) => ({

@@ -25,7 +25,7 @@ Card.prototype.sortValue = function() {
 };
 
 Card.prototype.sortComparator = function(a, b) {
-    return a.sortValue() - b.sortValue();
+    return b.sortValue() - a.sortValue();
 };
 
 
