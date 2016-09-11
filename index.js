@@ -58,8 +58,20 @@ io.on('connection', function (socket)
     		socket.name = name;
             let newPlayer = lobby.addPlayer(name);
 
+            let convert = (player) => ({
+                name: player.name,
+                ready:  player.ready,
+                lives: player.lives,
+                won: player.won,
+                bet: player.bet,
+                isAlive: player.isAlive,
+                card: ''
+            });
+
+            newPlayer = convert(newPlayer);
+
             //Update new player to other clients
-            socket.broadcast.emit('player-connect',convertPlayer(newPlayer));
+            socket.broadcast.emit('player-connect', newPlayer);
         }
 	};
 
@@ -209,11 +221,17 @@ io.on('connection', function (socket)
     };
 
     function createClientPlayerList(playerL) {
-        var clientPlayerList = [];
-
-        for (var i = 0; i < playerL.length; i++) {
-            clientPlayerList.push(convertPlayer(playerL[i]));
-        }
+        var clientPlayerList = playerL.map(
+            (player) => ({
+                name: player.name,
+                ready:  player.ready,
+                lives: player.lives,
+                won: player.won,
+                bet: player.bet,
+                isAlive: player.isAlive,
+                card: ''
+            })
+        );
 
         return clientPlayerList;
     };
