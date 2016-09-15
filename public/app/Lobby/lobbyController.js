@@ -12,6 +12,8 @@
 		vm.readyToStart = false;
 		vm.firstPlayer = false;
 		vm.name = '';
+		vm.manilhas = ["4C","7H","AS","7D"];
+		vm.weakCards = ["3S","2H","AD","KS","JH","QS","7C","6H","5D","4S"];
 
 		// Model player list
 		vm.players = [];
@@ -21,6 +23,7 @@
         vm.readyButton = readyButton;
         vm.startGame = startGame;
 		vm.kickPlayer = kickPlayer;
+		vm.cardIsRed = cardIsRed;
 
         //Socket listener events
 		socket.on('player-connect', playerConnectCB);
@@ -80,6 +83,10 @@
 		function kickPlayer(name) {
 			socket.emit('kick-player', name);
 			lobbyService.removePlayer(name);
+		};
+
+		function cardIsRed(card) {
+			return (card[1] == 'H' || card[1] == 'D');
 		};
 
         ///////////////////////////////
