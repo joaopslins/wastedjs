@@ -1,1 +1,2 @@
 # WastedJS
+test
