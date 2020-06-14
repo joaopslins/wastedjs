@@ -20,6 +20,7 @@ app.get('/', function(request, response) {
   response.sendFile(__dirname + "/public/index.html");
 });
 
+
 server.listen(app.get('port'), function () {
   console.log('Server listening at port %d', app.get('port'));
 });

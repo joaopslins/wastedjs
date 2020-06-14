@@ -16,11 +16,11 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          Learn Reactasdasd
         </a>
       </header>
     </div>
-  );
+  );  
 }
 
 export default App;
