@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import path from "path";
 import http from "http";
 import socket_io from "socket.io";
-import { init } from "./src/io";
+import { init } from "./src/io.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
