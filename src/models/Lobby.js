@@ -1,5 +1,5 @@
-import Game from "./game.js";
-import Player from "./player.js";
+import Game from "./Game.js";
+import Player from "./Player.js";
 
 const isNameUnavailable = (name, players) => {
   return !!players.find((player) => player.name === name);

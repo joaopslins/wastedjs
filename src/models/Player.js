@@ -1,4 +1,4 @@
-import Deck from "./deck.js";
+import Deck from "./Deck.js";
 
 export default class Player {
   constructor(name) {
