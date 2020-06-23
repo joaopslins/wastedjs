@@ -2,7 +2,7 @@ import Lobby from "./models/Lobby.js";
 import { SocketService } from "./models/SocketService.js";
 import { GamePhaseEnum } from "./constants.js";
 import { wait } from "./utils.js";
-import { ClientSocketEvents } from "../shared/SocketEvents.js";
+import { ClientEvents, ServerEvents } from "../shared/SocketEvents.js";
 
 const lobby = new Lobby();
 const callInterval = 3000; //in ms
@@ -44,7 +44,7 @@ const loginEvent = (socketService) => (name, callback) => {
     newPlayer = convert(newPlayer);
 
     //Update new player to other clients
-    socketService.broadcast(ClientSocketEvents.PLAYER_CONNECT, newPlayer);
+    socketService.broadcast(ServerEvents.PLAYER_CONNECT, newPlayer);
   } else {
     console.log(name + " login denied");
   }
@@ -54,7 +54,7 @@ const readyEvent = (socketService) => (client) => {
   console.log(client.name + " ready is " + client.ready);
   //Update player in server player list
   lobby.setReady(client);
-  socketService.broadcast(ClientSocketEvents.PLAYER_READY, client);
+  socketService.broadcast(ServerEvents.PLAYER_READY, client);
 };
 
 const playerBetEvent = (socketService) => (bet) => {
@@ -63,7 +63,7 @@ const playerBetEvent = (socketService) => (bet) => {
 
   let startPlayPhase = lobby.game.phase === GamePhaseEnum.PLAY;
 
-  socketService.emit(ClientSocketEvents.UPDATE_BET, {
+  socketService.emit(ServerEvents.UPDATE_BET, {
     bet: bet,
     playerWhoBet: socketService.getName(),
     nextPlayer: lobby.game.roundPlayer,
@@ -80,7 +80,7 @@ const playerPlayEvent = (socketService) => async (card) => {
   if (game.phase === GamePhaseEnum.END) {
     console.log("round over");
     //Round is over
-    socketService.emit(ClientSocketEvents.PLAYER_PLAY_UPDATE, {
+    socketService.emit(ServerEvents.PLAYER_PLAY_UPDATE, {
       card: card,
       playerWhoPlayed: socketService.getName(),
       nextPlayer: "",
@@ -91,7 +91,7 @@ const playerPlayEvent = (socketService) => async (card) => {
     if (game.phase === GamePhaseEnum.END_MATCH) {
       await wait(callInterval);
 
-      socketService.emit(ClientSocketEvents.NEW_ROUND, {
+      socketService.emit(ServerEvents.NEW_ROUND, {
         players: createClientPlayerList(game.players),
         playerToPlay: "",
       });
@@ -106,13 +106,13 @@ const playerPlayEvent = (socketService) => async (card) => {
 
         lobby.game = null;
         socketService.emit(
-          ClientSocketEvents.END_GAME,
+          ServerEvents.END_GAME,
           createClientPlayerList(game.players)
         );
       } else if (game.phase === GamePhaseEnum.BET) {
         await wait(callInterval);
 
-        socketService.emit(ClientSocketEvents.NEW_MATCH, {
+        socketService.emit(ServerEvents.NEW_MATCH, {
           players: createClientPlayerList(game.players),
           playerToPlay: game.startMatchPlayer,
         });
@@ -121,14 +121,14 @@ const playerPlayEvent = (socketService) => async (card) => {
       //Match is not over
       await wait(callInterval);
 
-      socketService.emit(ClientSocketEvents.NEW_ROUND, {
+      socketService.emit(ServerEvents.NEW_ROUND, {
         players: createClientPlayerList(game.players),
         playerToPlay: game.roundPlayer,
       });
     }
   } else if (game.phase === GamePhaseEnum.PLAY) {
     //Continue playing the same round
-    socketService.emit(ClientSocketEvents.PLAYER_PLAY_UPDATE, {
+    socketService.emit(ServerEvents.PLAYER_PLAY_UPDATE, {
       card: card,
       playerWhoPlayed: socketService.getName(),
       nextPlayer: game.roundPlayer,
@@ -139,7 +139,7 @@ const playerPlayEvent = (socketService) => async (card) => {
 const startGameEvent = (socketService) => () => {
   console.log("game started!");
   lobby.startGame();
-  socketService.emit(ClientSocketEvents.GAME_START_NOTIFICATION, {
+  socketService.emit(ServerEvents.GAME_START_NOTIFICATION, {
     startingPlayer: lobby.game.startMatchPlayer,
     playerList: createClientPlayerList(lobby.game.players),
   });
@@ -164,7 +164,7 @@ const kickPlayerEvent = (socketService) => (name) => {
   console.log(name + " was kicked by " + socketService.getName());
 
   const targetSocket = socketService.getSocketByName(name);
-  targetSocket.emit(ClientSocketEvents.KICKED);
+  targetSocket.emit(ServerEvents.KICKED);
   targetSocket.disconnect();
 };
 
@@ -175,7 +175,7 @@ const disconnectEvent = (socketService) => () => {
   if (name) {
     lobby.disconnect(name);
 
-    socketService.broadcast(ClientSocketEvents.PLAYER_DISCONNECT, name);
+    socketService.broadcast(ServerEvents.PLAYER_DISCONNECT, name);
   }
 };
 
@@ -183,14 +183,17 @@ export const init = (io) => {
   io.on("connection", (socket) => {
     socketService = new SocketService(io, socket);
 
-    socket.on("login", loginEvent(socketService));
-    socket.on("ready", readyEvent(socketService));
-    socket.on("player-bet", playerBetEvent(socketService));
-    socket.on("player-play-card", playerPlayEvent(socketService));
-    socket.on("start-game", startGameEvent(socketService));
-    socket.on("request-cards", requestCardsEvent(socketService));
-    socket.on("request-playerlist", requestPlayerListEvent(socketService));
-    socket.on("kick-player", kickPlayerEvent(socketService));
-    socket.on("disconnect", disconnectEvent(socketService));
+    socket.on(ClientEvents.LOGIN, loginEvent(socketService));
+    socket.on(ClientEvents.READY, readyEvent(socketService));
+    socket.on(ClientEvents.BET, playerBetEvent(socketService));
+    socket.on(ClientEvents.PLAY_CARD, playerPlayEvent(socketService));
+    socket.on(ClientEvents.START, startGameEvent(socketService));
+    socket.on(ClientEvents.REQUEST_CARDS, requestCardsEvent(socketService));
+    socket.on(
+      ClientEvents.REQUEST_PLAYER_LIST,
+      requestPlayerListEvent(socketService)
+    );
+    socket.on(ClientEvents.KICK, kickPlayerEvent(socketService));
+    socket.on(ClientEvents.DISCONNECT, disconnectEvent(socketService));
   });
 };
