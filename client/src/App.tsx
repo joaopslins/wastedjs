@@ -1,22 +1,33 @@
 import React from "react";
-import { Navbar } from "react-bootstrap";
+import { Navbar, Container } from "react-bootstrap";
 import { Switch, Route } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
+import styled from "styled-components";
+
+const AppContainer = styled.div`
+  background: #efefef;
+  height: 100%;
+`;
 
 const App = () => (
   <>
-    <Navbar bg="dark" variant="dark">
-      <Navbar.Brand>WastedJS</Navbar.Brand>
-    </Navbar>
+    <AppContainer>
+      <Container fluid>
+        <Navbar bg="dark" variant="dark">
+          <Navbar.Brand>WastedJS</Navbar.Brand>
+        </Navbar>
 
-    {/* Routing */}
-    <Switch>
-      <Route exact path="/">
-        <LoginPage />
-      </Route>
-      <Route path="/lobby"></Route>
-      <Route path="/game"></Route>
-    </Switch>
+        {/* Routing */}
+
+        <Switch>
+          <Route exact path="/">
+            <LoginPage />
+          </Route>
+          <Route path="/lobby"></Route>
+          <Route path="/game"></Route>
+        </Switch>
+      </Container>
+    </AppContainer>
   </>
 );
 

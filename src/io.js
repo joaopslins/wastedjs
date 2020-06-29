@@ -2,7 +2,7 @@ import Lobby from "./models/Lobby.js";
 import { SocketService } from "./models/SocketService.js";
 import { GamePhaseEnum } from "./constants.js";
 import { wait } from "./utils.js";
-import { ClientEvents, ServerEvents } from "../shared/SocketEvents.js";
+import { ClientEvents, ServerEvents } from "./constants.js";
 
 const lobby = new Lobby();
 const callInterval = 3000; //in ms
@@ -181,7 +181,7 @@ const disconnectEvent = (socketService) => () => {
 
 export const init = (io) => {
   io.on("connection", (socket) => {
-    socketService = new SocketService(io, socket);
+    const socketService = new SocketService(io, socket);
 
     socket.on(ClientEvents.LOGIN, loginEvent(socketService));
     socket.on(ClientEvents.READY, readyEvent(socketService));
