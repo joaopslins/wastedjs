@@ -11,6 +11,8 @@ type SocketProviderProps = {
 class Socket {
   constructor(private socket: SocketIOClient.Socket) {}
 
+  loggedIn = false;
+
   private emit = (event: ClientEvents, ...args: any[]) => {
     return new Promise<any>((res) => {
       this.socket.emit(event, ...args, (data: any) => {
@@ -19,8 +21,12 @@ class Socket {
     });
   };
 
-  login = (name: string): Promise<number> => {
+  login = (name: string): Promise<string> => {
     return this.emit(ClientEvents.LOGIN, name);
+  };
+
+  requestPlayerList = () => {
+    return this.emit(ClientEvents.REQUEST_PLAYER_LIST);
   };
 }
 

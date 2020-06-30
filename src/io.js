@@ -21,12 +21,12 @@ const createClientPlayerList = (playerL) =>
 const loginEvent = (socketService) => (name, callback) => {
   console.log(name + " login");
 
-  let success = lobby.checkLogin(name);
+  let error = lobby.checkLogin(name);
 
   //Return playerlist and success to requested player
-  callback(success);
+  callback(error);
 
-  if (success === 0) {
+  if (!error) {
     //Add new player to server player list and socket
     socketService.setName(name);
     let newPlayer = lobby.addPlayer(name);
@@ -169,8 +169,9 @@ const kickPlayerEvent = (socketService) => (name) => {
 };
 
 const disconnectEvent = (socketService) => () => {
-  console.log(socketService.name + " disconnected");
   const name = socketService.getName();
+  console.log(name + " disconnected");
+
   //if undefined, dont emit events
   if (name) {
     lobby.disconnect(name);

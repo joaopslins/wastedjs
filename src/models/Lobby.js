@@ -27,16 +27,14 @@ export default class Lobby {
 
   checkLogin = (name) => {
     if (isNameUnavailable(name, this.players)) {
-      return 1;
+      return "Nick was already taken!";
     } else if (this.players.length === 5) {
-      //If game is full
-      return 2;
-    } else if (!this.game) {
-      //If game is on
-      return 3;
+      return "Room is full!";
+    } else if (this.game) {
+      return "Room in game!";
     }
 
-    return 0;
+    return "";
   };
 
   startGame = () => {

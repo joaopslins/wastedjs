@@ -1,7 +1,16 @@
 import React, { useState } from "react";
-import { Card, Row, Col, Form, Button, FormGroup } from "react-bootstrap";
+import {
+  Card,
+  Row,
+  Col,
+  Form,
+  Button,
+  FormGroup,
+  Alert,
+} from "react-bootstrap";
 import styled from "styled-components";
 import { useSocket } from "../socket";
+import { useHistory } from "react-router-dom";
 
 const LoginPageContainer = styled.div`
   margin-top: 96px;
@@ -9,11 +18,22 @@ const LoginPageContainer = styled.div`
 
 export const LoginPage = () => {
   const [nick, setNick] = useState("");
+  const [error, setError] = useState("");
   const socket = useSocket();
+  const history = useHistory();
 
   const handleSubmit = async () => {
-    const success = await socket.login(nick);
-    console.log(success);
+    if (!nick) return;
+
+    const loginError = await socket.login(nick);
+
+    if (loginError) {
+      setError(loginError);
+      return;
+    }
+
+    socket.loggedIn = true;
+    history.push("/lobby");
   };
 
   return (
@@ -35,6 +55,11 @@ export const LoginPage = () => {
               <Button type="button" block onClick={handleSubmit}>
                 Join Lobby
               </Button>
+              {error && (
+                <Alert className="mt-3" variant="danger">
+                  {error}
+                </Alert>
+              )}
             </Card.Body>
           </Card>
         </Col>

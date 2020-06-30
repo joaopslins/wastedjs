@@ -1,13 +1,25 @@
 import React from "react";
 import { Navbar, Container } from "react-bootstrap";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
 import styled from "styled-components";
+import { useSocket } from "./socket";
+import { LobbyPage } from "./pages/LobbyPage";
+import { GamePage } from "./pages/GamePage";
 
 const AppContainer = styled.div`
   background: #efefef;
   height: 100%;
 `;
+
+type PrivateRouteProps = {
+  children: React.ReactElement;
+};
+
+const PrivateGuard = ({ children }: PrivateRouteProps) => {
+  const socket = useSocket();
+  return socket.loggedIn ? children : <Redirect to="/" />;
+};
 
 const App = () => (
   <>
@@ -23,8 +35,18 @@ const App = () => (
           <Route exact path="/">
             <LoginPage />
           </Route>
-          <Route path="/lobby"></Route>
-          <Route path="/game"></Route>
+
+          <Route path="/lobby">
+            <PrivateGuard>
+              <LobbyPage></LobbyPage>
+            </PrivateGuard>
+          </Route>
+
+          <Route path="/game">
+            <PrivateGuard>
+              <GamePage></GamePage>
+            </PrivateGuard>
+          </Route>
         </Switch>
       </Container>
     </AppContainer>
