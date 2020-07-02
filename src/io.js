@@ -4,6 +4,7 @@ import { GamePhaseEnum } from "./constants.js";
 import { wait } from "./utils.js";
 import { ClientEvents, ServerEvents } from "./constants.js";
 
+const log = console.log;
 const lobby = new Lobby();
 const callInterval = 3000; //in ms
 
@@ -19,7 +20,7 @@ const createClientPlayerList = (playerL) =>
   }));
 
 const loginEvent = (socketService) => (name, callback) => {
-  console.log(name + " login");
+  log(name + " login");
 
   let error = lobby.checkLogin(name);
 
@@ -46,19 +47,19 @@ const loginEvent = (socketService) => (name, callback) => {
     //Update new player to other clients
     socketService.broadcast(ServerEvents.PLAYER_CONNECT, newPlayer);
   } else {
-    console.log(name + " login denied");
+    log(name + " login denied");
   }
 };
 
 const readyEvent = (socketService) => (client) => {
-  console.log(client.name + " ready is " + client.ready);
+  log(client.name + " ready is " + client.ready);
   //Update player in server player list
   lobby.setReady(client);
   socketService.broadcast(ServerEvents.PLAYER_READY, client);
 };
 
 const playerBetEvent = (socketService) => (bet) => {
-  console.log(socketService.getName() + " betted " + bet);
+  log(socketService.getName() + " betted " + bet);
   lobby.game.playerBet(socket.name, bet);
 
   let startPlayPhase = lobby.game.phase === GamePhaseEnum.PLAY;
@@ -72,13 +73,13 @@ const playerBetEvent = (socketService) => (bet) => {
 };
 
 const playerPlayEvent = (socketService) => async (card) => {
-  console.log(socketService.getName() + " player card " + card);
+  log(socketService.getName() + " player card " + card);
 
   let { game } = lobby;
   game.playerPlayCard(socketService.getName(), card);
 
   if (game.phase === GamePhaseEnum.END) {
-    console.log("round over");
+    log("round over");
     //Round is over
     socketService.emit(ServerEvents.PLAYER_PLAY_UPDATE, {
       card: card,
@@ -97,11 +98,11 @@ const playerPlayEvent = (socketService) => async (card) => {
       });
 
       //Match is over
-      console.log("match over");
+      log("match over");
       game.matchEnd();
 
       if (game.phase === GamePhaseEnum.END_GAME) {
-        console.log("game over");
+        log("game over");
         await wait(callInterval);
 
         lobby.game = null;
@@ -137,7 +138,7 @@ const playerPlayEvent = (socketService) => async (card) => {
 };
 
 const startGameEvent = (socketService) => () => {
-  console.log("game started!");
+  log("game started!");
   lobby.startGame();
   socketService.emit(ServerEvents.GAME_START_NOTIFICATION, {
     startingPlayer: lobby.game.startMatchPlayer,
@@ -146,14 +147,14 @@ const startGameEvent = (socketService) => () => {
 };
 
 const requestCardsEvent = (socketService) => (data, callback) => {
-  console.log(socketService.getName() + " asked his cards");
+  log(socketService.getName() + " asked his cards");
   callback({
     cards: lobby.game.getCardsFromPlayer(socketService.getName()),
   });
 };
 
-const requestPlayerListEvent = (socketService) => (data, callback) => {
-  console.log(socketService.getName() + " asked for playerlist");
+const requestPlayerListEvent = (socketService) => (callback) => {
+  log(socketService.getName() + " asked for playerlist");
   callback({
     name: socketService.getName(),
     playerList: createClientPlayerList(lobby.players),
@@ -161,7 +162,7 @@ const requestPlayerListEvent = (socketService) => (data, callback) => {
 };
 
 const kickPlayerEvent = (socketService) => (name) => {
-  console.log(name + " was kicked by " + socketService.getName());
+  log(name + " was kicked by " + socketService.getName());
 
   const targetSocket = socketService.getSocketByName(name);
   targetSocket.emit(ServerEvents.KICKED);
@@ -170,7 +171,7 @@ const kickPlayerEvent = (socketService) => (name) => {
 
 const disconnectEvent = (socketService) => () => {
   const name = socketService.getName();
-  console.log(name + " disconnected");
+  log(name + " disconnected");
 
   //if undefined, dont emit events
   if (name) {

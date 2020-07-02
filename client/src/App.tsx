@@ -18,13 +18,13 @@ type PrivateRouteProps = {
 
 const PrivateGuard = ({ children }: PrivateRouteProps) => {
   const socket = useSocket();
-  return socket.loggedIn ? children : <Redirect to="/" />;
+  return socket.isConnected ? children : <Redirect to="/" />;
 };
 
 const App = () => (
   <>
     <AppContainer>
-      <Container fluid>
+      <Container>
         <Navbar bg="dark" variant="dark">
           <Navbar.Brand>WastedJS</Navbar.Brand>
         </Navbar>

@@ -11,7 +11,7 @@ type SocketProviderProps = {
 class Socket {
   constructor(private socket: SocketIOClient.Socket) {}
 
-  loggedIn = false;
+  isConnected = false;
 
   private emit = (event: ClientEvents, ...args: any[]) => {
     return new Promise<any>((res) => {
@@ -22,11 +22,22 @@ class Socket {
   };
 
   login = (name: string): Promise<string> => {
+    this.connect();
     return this.emit(ClientEvents.LOGIN, name);
   };
 
   requestPlayerList = () => {
     return this.emit(ClientEvents.REQUEST_PLAYER_LIST);
+  };
+
+  connect = () => {
+    this.socket.connect();
+    this.isConnected = true;
+  };
+
+  disconnect = () => {
+    this.socket.disconnect();
+    this.isConnected = false;
   };
 }
 
@@ -37,7 +48,6 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     const socket = SocketIOClient(
       process.env.REACT_APP_SOCKET_ADDRESS || "http://localhost:5000"
     );
-    socket.connect();
 
     // TODO listen to events
     setSocketValue(new Socket(socket));

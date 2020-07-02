@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   Row,
@@ -17,10 +17,22 @@ const LoginPageContainer = styled.div`
 `;
 
 export const LoginPage = () => {
+  // Auto login, for quick reload
+  // useEffect(() => {
+  //   handleSubmit();
+  // }, []);
+  // const [nick, setNick] = useState("hi");
+
   const [nick, setNick] = useState("");
   const [error, setError] = useState("");
   const socket = useSocket();
   const history = useHistory();
+
+  useEffect(() => {
+    if (socket.isConnected) {
+      socket.disconnect();
+    }
+  }, [socket]);
 
   const handleSubmit = async () => {
     if (!nick) return;
@@ -32,7 +44,6 @@ export const LoginPage = () => {
       return;
     }
 
-    socket.loggedIn = true;
     history.push("/lobby");
   };
 
