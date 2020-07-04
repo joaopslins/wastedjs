@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import SocketIOClient from "socket.io-client";
-import { ClientEvents } from "./constants";
+import { ClientEvents, ServerEvents } from "./constants";
+import {
+  Player,
+  playerConnect,
+  playerReady,
+  playerDisconnect,
+} from "./redux/gameSlice";
+import { useDispatch } from "react-redux";
 
 const SocketContext = createContext<Socket>(undefined!);
 
@@ -30,26 +37,46 @@ class Socket {
     return this.emit(ClientEvents.REQUEST_PLAYER_LIST);
   };
 
+  ready = (name: string, ready: boolean) => {
+    return this.emit(ClientEvents.READY, {
+      name,
+      ready,
+    });
+  };
+
   connect = () => {
-    this.socket.connect();
     this.isConnected = true;
+    this.socket.connect();
   };
 
   disconnect = () => {
-    this.socket.disconnect();
     this.isConnected = false;
+    this.socket.disconnect();
   };
 }
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [socketValue, setSocketValue] = useState<Socket | null>(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const socket = SocketIOClient(
       process.env.REACT_APP_SOCKET_ADDRESS || "http://localhost:5000"
     );
 
-    // TODO listen to events
+    socket.on(ServerEvents.PLAYER_CONNECT, (data: Player) => {
+      dispatch(playerConnect(data));
+    });
+    socket.on(
+      ServerEvents.PLAYER_READY,
+      (data: { name: string; ready: boolean }) => {
+        dispatch(playerReady(data));
+      }
+    );
+    socket.on(ServerEvents.PLAYER_DISCONNECT, (data: string) => {
+      dispatch(playerDisconnect(data));
+    });
+
     setSocketValue(new Socket(socket));
   }, []);
 

@@ -17,13 +17,7 @@ const LoginPageContainer = styled.div`
 `;
 
 export const LoginPage = () => {
-  // Auto login, for quick reload
-  // useEffect(() => {
-  //   handleSubmit();
-  // }, []);
-  // const [nick, setNick] = useState("hi");
-
-  const [nick, setNick] = useState("");
+  // const [nick, setNick] = useState("");
   const [error, setError] = useState("");
   const socket = useSocket();
   const history = useHistory();
@@ -32,7 +26,13 @@ export const LoginPage = () => {
     if (socket.isConnected) {
       socket.disconnect();
     }
-  }, [socket]);
+  }, []);
+
+  // Auto login, for quick reload
+  useEffect(() => {
+    handleSubmit();
+  }, []);
+  const [nick, setNick] = useState("hi");
 
   const handleSubmit = async () => {
     if (!nick) return;
