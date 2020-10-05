@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useSocket, SocketProvider } from "../socket";
+import { useSocket, SocketProvider } from "../../socket";
 import { useDispatch, useSelector } from "react-redux";
-import { saveName, savePlayerList, playerReady } from "../redux/gameSlice";
+import { saveName, savePlayerList, playerReady } from "../../redux/gameSlice";
 import {
   selectName,
   selectPlayerList,
   selectCurrentPlayer,
-} from "../redux/selectors";
+} from "../../redux/selectors";
 import styled from "styled-components";
 import { Row, Col, Card, Button } from "react-bootstrap";
-import { ReduxState } from "../redux/store";
+import { ReduxState } from "../../redux/store";
 import { useHistory } from "react-router-dom";
 import { BsExclamationCircle, BsCheckCircle, BsCheck } from "react-icons/bs";
+import { LobbyInstructions } from "./LobbyInstructions";
 
 const LobbyPageContainer = styled.div`
-  margin-top: 96px;
+  margin-top: 80px;
 `;
 
 const PlayerlistItem = styled.div<{
@@ -108,6 +109,9 @@ export const LobbyPage = () => {
               )}
             </Card.Footer>
           </Card>
+        </Col>
+        <Col xs="8" md="9">
+          <LobbyInstructions />
         </Col>
       </Row>
     </LobbyPageContainer>

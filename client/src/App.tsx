@@ -1,15 +1,16 @@
 import React from "react";
 import { Navbar, Container } from "react-bootstrap";
 import { Switch, Route, Redirect } from "react-router-dom";
-import { LoginPage } from "./pages/LoginPage";
+import { LoginPage } from "./pages/login/LoginPage";
 import styled from "styled-components";
 import { useSocket } from "./socket";
-import { LobbyPage } from "./pages/LobbyPage";
-import { GamePage } from "./pages/GamePage";
+import { LobbyPage } from "./pages/lobby/LobbyPage";
+import { GamePage } from "./pages/game/GamePage";
 
 const AppContainer = styled.div`
   background: #efefef;
-  height: 100%;
+  min-height: 100%;
+  padding: 0 0 48px;
 `;
 
 type PrivateRouteProps = {

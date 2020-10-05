@@ -9,11 +9,11 @@ import {
   Alert,
 } from "react-bootstrap";
 import styled from "styled-components";
-import { useSocket } from "../socket";
+import { useSocket } from "../../socket";
 import { useHistory } from "react-router-dom";
 
 const LoginPageContainer = styled.div`
-  margin-top: 96px;
+  margin-top: 80px;
 `;
 
 export const LoginPage = () => {
