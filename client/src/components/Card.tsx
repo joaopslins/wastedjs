@@ -45,7 +45,7 @@ type CardProps = {
   onClick?: () => void;
 };
 
-export const Card = ({ card = "AH", onClick = () => {} }: CardProps) => {
+export const Card = ({ card, onClick = () => {} }: CardProps) => {
   const rank = card[0];
   const suit = card[1];
   let color = "black";

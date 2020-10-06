@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useSocket, SocketProvider } from "../../socket";
 import { useDispatch, useSelector } from "react-redux";
-import { saveName, savePlayerList, playerReady } from "../../redux/gameSlice";
+import {
+  saveName,
+  savePlayerList,
+  playerReady,
+  playerRemove,
+  Player,
+} from "../../redux/gameSlice";
 import {
   selectName,
   selectPlayerList,
@@ -11,7 +17,12 @@ import styled from "styled-components";
 import { Row, Col, Card, Button } from "react-bootstrap";
 import { ReduxState } from "../../redux/store";
 import { useHistory } from "react-router-dom";
-import { BsExclamationCircle, BsCheckCircle, BsCheck } from "react-icons/bs";
+import {
+  BsExclamationCircle,
+  BsCheckCircle,
+  BsCheck,
+  BsTrash,
+} from "react-icons/bs";
 import { LobbyInstructions } from "./LobbyInstructions";
 
 const LobbyPageContainer = styled.div`
@@ -25,6 +36,22 @@ const PlayerlistItem = styled.div<{
   display: flex;
   align-items: center;
   color: ${({ ready }) => (ready ? "darkgreen" : "darkred")};
+`;
+
+const TrashButton = styled(Button)`
+  padding: 0;
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > * {
+    height: 12px;
+    width: 12px;
+  }
 `;
 
 export const LobbyPage = () => {
@@ -59,9 +86,20 @@ export const LobbyPage = () => {
 
   const handleStartGame = () => {};
 
+  const handleKickPlayer = (player: Player) => {
+    dispatch(playerRemove(player.name));
+    socket.removePlayer(player.name);
+  };
+
   const isHost = currentPlayer?.name === playerList[0]?.name;
   const isEveryoneReady = playerList.every((player) => player.ready);
   const canStartGame = isEveryoneReady && playerList.length > 1;
+
+  // Auto ready, for quick reload
+  useEffect(() => {
+    if (!currentPlayer || currentPlayer.ready) return;
+    handleReady();
+  }, [currentPlayer]);
 
   if (loading) return null;
 
@@ -84,12 +122,21 @@ export const LobbyPage = () => {
             <Card.Header>Players</Card.Header>
             <Card.Body>
               {playerList.map((player) => (
-                <>
-                  <PlayerlistItem ready={player.ready}>
-                    {player.ready ? <BsCheck /> : <BsExclamationCircle />}
-                    <span className="ml-1">{player.name}</span>
-                  </PlayerlistItem>
-                </>
+                <PlayerlistItem ready={player.ready}>
+                  {player.ready ? <BsCheck /> : <BsExclamationCircle />}
+                  <span className="ml-1">{player.name}</span>
+                  {player !== currentPlayer && isHost && (
+                    <TrashButton
+                      title={`Kick player ${player.name}`}
+                      type="button"
+                      variant="outline-danger"
+                      onClick={() => handleKickPlayer(player)}
+                      disabled={!canStartGame}
+                    >
+                      <BsTrash />
+                    </TrashButton>
+                  )}
+                </PlayerlistItem>
               ))}
             </Card.Body>
             <Card.Footer>

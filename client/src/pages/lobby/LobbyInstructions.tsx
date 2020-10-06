@@ -6,10 +6,11 @@ import { Card } from "../../components/Card";
 const CardsWrapper = styled.div`
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   padding: 8px 0;
 
-  > * + * {
-    margin-left: 8px;
+  > * {
+    margin: 4px;
     flex: 0 1 auto;
   }
 `;

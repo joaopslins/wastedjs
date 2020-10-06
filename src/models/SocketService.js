@@ -15,7 +15,13 @@ export class SocketService {
   };
 
   getSocketByName = (name) => {
-    return this.io.sockets.connected.find((socket) => name === socket.name);
+    for (const socket of Object.values(this.io.sockets.connected)) {
+      if (socket.name === name) {
+        return socket;
+      }
+    }
+
+    return;
   };
 
   getName = () => this.socket.name;

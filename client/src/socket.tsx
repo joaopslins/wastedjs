@@ -5,9 +5,10 @@ import {
   Player,
   playerConnect,
   playerReady,
-  playerDisconnect,
+  playerRemove,
 } from "./redux/gameSlice";
 import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 const SocketContext = createContext<Socket>(undefined!);
 
@@ -44,6 +45,14 @@ class Socket {
     });
   };
 
+  startGame = () => {
+    return this.emit(ClientEvents.START);
+  };
+
+  removePlayer = (playerName: string) => {
+    return this.emit(ClientEvents.KICK, playerName);
+  };
+
   connect = () => {
     this.isConnected = true;
     this.socket.connect();
@@ -57,6 +66,7 @@ class Socket {
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [socketValue, setSocketValue] = useState<Socket | null>(null);
+  const history = useHistory();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -73,8 +83,11 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
         dispatch(playerReady(data));
       }
     );
+    socket.on(ServerEvents.KICKED, () => {
+      history.push("/");
+    });
     socket.on(ServerEvents.PLAYER_DISCONNECT, (data: string) => {
-      dispatch(playerDisconnect(data));
+      dispatch(playerRemove(data));
     });
 
     setSocketValue(new Socket(socket));

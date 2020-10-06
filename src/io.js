@@ -163,8 +163,11 @@ const requestPlayerListEvent = (socketService) => (callback) => {
 
 const kickPlayerEvent = (socketService) => (name) => {
   log(name + " was kicked by " + socketService.getName());
+  // TODO validate if was kicked by the host
 
   const targetSocket = socketService.getSocketByName(name);
+  if (!targetSocket) return;
+
   targetSocket.emit(ServerEvents.KICKED);
   targetSocket.disconnect();
 };

@@ -43,7 +43,7 @@ const gameSlice = createSlice({
 
       player.ready = action.payload.ready;
     },
-    playerDisconnect: (store, action: PayloadAction<string>) => {
+    playerRemove: (store, action: PayloadAction<string>) => {
       store.playerList = store.playerList.filter(
         (player) => player.name !== action.payload
       );
@@ -56,7 +56,7 @@ export const {
   savePlayerList,
   playerConnect,
   playerReady,
-  playerDisconnect,
+  playerRemove,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

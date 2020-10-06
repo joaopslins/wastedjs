@@ -32,7 +32,8 @@ export const LoginPage = () => {
   useEffect(() => {
     handleSubmit();
   }, []);
-  const [nick, setNick] = useState("hi");
+  const d = new Date();
+  const [nick, setNick] = useState(`hi${d.getSeconds()}${d.getMilliseconds()}`);
 
   const handleSubmit = async () => {
     if (!nick) return;
